@@ -1,12 +1,12 @@
 import React from "react";
-import pelaporLayout from "../../../Layout/PelaporLayout";
+import PelaporLayout from "../../../Layout/PelaporLayout";
 import HomeDashboard from "../../../Section/DashboardPelapor/Home/HomeDashboard";
 
 const HomePelaporPage = () => {
   return (
-    <pelaporLayout>
+    <PelaporLayout>
       <HomeDashboard />
-    </pelaporLayout>
+    </PelaporLayout>
   );
 };
 
