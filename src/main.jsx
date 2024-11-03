@@ -13,7 +13,7 @@ import { EditProfileUser } from "./component/pages/Pelapor/EditProfileUserPage/E
 import { LoginPage } from "./component/pages/auth/LoginPage/LoginPage";
 import { RegisterPage } from "./component/pages/auth/RegisterPage/RegisterPage";
 import { ToastNotif } from "./component/bases/Toast/ToastNotif";
-import ProtectedRoute from "./content/protectedRoute";
+import {ProtectedRoute} from "./content/protectedRoute";
 import DataDisplay from "./component/Section/test";
 import axios from "axios";
 
