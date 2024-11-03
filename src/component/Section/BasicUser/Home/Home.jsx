@@ -66,7 +66,7 @@ const Home = ({ isLoggedIn }) => {
             </div>
           </div>
           <div className="hidden lg:mt-0 lg:col-span-5 lg:flex lg:justify-end">
-            {/* <Carousel /> */}
+            <Carousel />
           </div>
         </div>
       </section>
