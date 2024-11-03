@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { Footerdashboard } from "../Fragment/footerdashboard/footerdashboard";
 import { SpeedDial } from "../bases/SpeedDial/SpeedDial";
 
-const PelaporLayout = ({ children }) => {
+const pelaporLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
