@@ -51,11 +51,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/user-dashboard/parkir-liar",
-    element: <ParkirLiarpage />,
+    element: (
+      <ProtectedRoute allowedRoles={["user"]}>
+        <ParkirLiarpage />{" "}
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/user-dashboard/petugas-liar",
-    element: <PetugasLiarpage />,
+    element: (
+      <ProtectedRoute allowedRoles={["user"]}>
+        <PetugasLiarpage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/user-dashboard/edit-profile",
