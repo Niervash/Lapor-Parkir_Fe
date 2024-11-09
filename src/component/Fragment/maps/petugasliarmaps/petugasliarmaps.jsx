@@ -1,26 +1,30 @@
 import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
 
-export const Petugasliarmaps = () => {
-  const position = [-0.919173, 119.892917]; // Example coordinates (London)
+const LocationMarker = ({ onLocationClick }) => {
+  useMapEvents({
+    click(e) {
+      const { lat, lng } = e.latlng;
+      onLocationClick(lat, lng); // Call the function to update the parent component
+    },
+  });
 
+  return null; // This component does not render anything itself
+};
+
+export const Petugasliarmaps = ({ onLocationClick }) => {
   return (
     <MapContainer
-      center={position}
+      center={[-6.2, 106.816666]}
       zoom={13}
-      style={{ height: "100%", width: "100%" }} // Ensure it fills the parent container
-      className="leaflet-container"
+      style={{ height: "100%", width: "100%" }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <Marker position={position}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
+      <LocationMarker onLocationClick={onLocationClick} />{" "}
+      {/* Add the location marker for handling clicks */}
     </MapContainer>
   );
 };

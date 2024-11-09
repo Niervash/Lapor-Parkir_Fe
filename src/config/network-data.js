@@ -61,12 +61,10 @@ async function IsRegister(formData) {
   }
 }
 
-// Petugas Sections
-
 // Petugas Liar
 async function addDataPetugas(data) {
   try {
-    const response = await cookieApiClient.post(`${BASE_URL}/petugas/`, data);
+    const response = await cookieApiClient.post(`${BASE_URL}/petugas`, data);
     console.log("Data berhasil ditambahkan:", response.data);
     return response.data;
   } catch (error) {
@@ -78,20 +76,19 @@ async function addDataPetugas(data) {
 async function getAlldataPetugas(userId) {
   try {
     const response = await cookieApiClient.get(`${BASE_URL}/petugas/${userId}`);
+    return response.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error; // Lempar kembali error agar dapat ditangani di tempat lain
+    console.error("Gagal Menghubungkan Data:", error);
+    throw new Error("Gagal menghubungan data, Mohon ulang lagi nanti. ");
   }
 }
 
 async function UpdateDataPetugas() {}
 
-async function getDatabyIdPetugas() {}
-
 // Parkir liar
 async function addDataParkir(data) {
   try {
-    const response = await cookieApiClient.post(`${BASE_URL}/parkir/`, data);
+    const response = await cookieApiClient.post(`${BASE_URL}/parkir`, data);
     console.log("Data berhasil ditambahkan:", response.data);
     return response.data;
   } catch (error) {
@@ -100,6 +97,18 @@ async function addDataParkir(data) {
   }
 }
 
+async function getAlldataParkir(userId) {
+  try {
+    const response = await cookieApiClient.get(`${BASE_URL}/parkir/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Gagal Menghubungkan Data:", error);
+    throw new Error("Gagal menghubungan data, Mohon ulang lagi nanti. ");
+  }
+}
+
+async function UpdateDataParkirLiar() {}
+
 // Landing Page
 
 async function getDataDashboard() {
@@ -107,16 +116,7 @@ async function getDataDashboard() {
     const response = await cookieApiClient.get(`${BASE_URL}/dashboard`);
   } catch (error) {
     console.error("Error fetching data:", error);
-    throw error; // Lempar kembali error agar dapat ditangani di tempat lain
-  }
-}
-
-async function getAlldataParkir(userId) {
-  try {
-    const response = await cookieApiClient.get(`${BASE_URL}/parkir/${userId}`);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error; // Lempar kembali error agar dapat ditangani di tempat lain
+    throw error;
   }
 }
 
@@ -125,6 +125,7 @@ export {
   IsRegister,
   IsLogout,
   addDataPetugas,
+  addDataParkir,
   getAlldataPetugas,
   getDataDashboard,
   getAlldataParkir,

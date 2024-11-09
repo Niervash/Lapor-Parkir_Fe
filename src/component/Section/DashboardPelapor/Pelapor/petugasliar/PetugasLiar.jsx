@@ -1,4 +1,3 @@
-// File: src/components/pages/PetugasLiar/PetugasLiar.js
 import React, { useEffect, useState } from "react";
 import { Breadcrumbs } from "../../../../Fragment/BreadCrumbs/BreadCrumbs";
 import { ButtonInput } from "../../../../bases/buttoninput/buttoninput";
@@ -8,12 +7,17 @@ import { Pagination } from "../../../../bases/Dashboard/Pagination/Pagination";
 import { ModalPetugasLiar } from "../../../../Fragment/InputModal/PetugasLiar/ModalPetugasLiar";
 import { PaginationPages } from "../../../../../config/Common-Function";
 import { getAlldataPetugas } from "../../../../../config/network-data";
+import { ToastNotif } from "../../../../bases/Toast/ToastNotif";
 
 export const PetugasLiar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isparkirLiarModalOpen, setIsModalParkirLiarOpen] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [error, setError] = useState(null);
   const itemsPerPage = 10;
 
   // Mendapatkan userId dari session
@@ -25,10 +29,31 @@ export const PetugasLiar = () => {
       try {
         const response = await getAlldataPetugas(userId);
         setData(response);
+
+        if (!error) {
+          setToastMessage("Data berhasil ditambahkan!");
+          setToastType("success");
+          setShowToast(true);
+        } else {
+          setToastMessage(
+            typeof data === "string"
+              ? data
+              : "Fetching data gagal. Silakan coba lagi."
+          );
+          setToastType("error");
+          setShowToast(true);
+        }
       } catch (err) {
         setError("Failed to fetch data. Please try again later.");
+        setToastMessage("Failed to fetch data. Please try again later.");
+        setToastType("error");
+        setShowToast(true);
       }
     }
+  };
+
+  const handleCloseToast = () => {
+    setShowToast(false);
   };
 
   useEffect(() => {
@@ -78,6 +103,13 @@ export const PetugasLiar = () => {
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
+        {showToast && (
+          <ToastNotif
+            message={toastMessage}
+            type={toastType}
+            onClose={handleCloseToast}
+          />
+        )}
         <ModalPetugasLiar
           isOpen={isparkirLiarModalOpen}
           onClose={handleModalParkir}

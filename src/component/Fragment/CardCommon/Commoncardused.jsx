@@ -7,7 +7,7 @@ import { Breadcrumbs } from "../BreadCrumbs/BreadCrumbs";
 import BerandaMaps from "../Maps/BerandaMaps";
 import cookieApiClient from "../../../config/axios-config";
 
-export const Commoncardused = () => {
+export const CommonCardused = () => {
   const [positions, setPositions] = useState([]);
   const [center, setCenter] = useState([-0.93975, 119.8974]);
   const [petugasData, setPetugasData] = useState([]);

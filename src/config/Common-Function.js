@@ -5,7 +5,6 @@ const resetHandlePetugas = (setFormData, setSuccess) => {
     identitas_Petugas: "",
     lokasi: "",
     bukti: null,
-    tanggalDanWaktu: "",
   });
 
   setSuccess("Data petugas berhasil dihapus!");
@@ -13,16 +12,31 @@ const resetHandlePetugas = (setFormData, setSuccess) => {
   return true;
 };
 
-const dateFormatted = (setTanggalDanWaktu, setFormData) => {
+const Waktuset = (setWaktu, setFormData) => {
   const now = new Date();
-  const formattedDate = now.toLocaleString("id-ID", {
+  const formattedTime = now.toLocaleTimeString("id-ID", {
     timeZone: "Asia/Makassar",
     hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
   });
-  setTanggalDanWaktu(formattedDate);
+  setWaktu(formattedTime);
   setFormData((prev) => ({
     ...prev,
-    TanggalDanWaktu: formattedDate,
+    waktu: formattedTime,
+  }));
+};
+
+const Hariset = (setHari, setFormData) => {
+  const now = new Date();
+  const formattedDay = now.toLocaleDateString("id-ID", {
+    weekday: "long", // Menghasilkan nama hari dalam bentuk panjang
+    timeZone: "Asia/Makassar",
+  });
+  setHari(formattedDay);
+  setFormData((prev) => ({
+    ...prev,
+    hari: formattedDay,
   }));
 };
 
@@ -42,4 +56,4 @@ const PaginationPages = (data, currentPage, itemsPerPage) => {
   };
 };
 
-export { resetHandlePetugas, dateFormatted, PaginationPages };
+export { resetHandlePetugas, PaginationPages, Waktuset, Hariset };

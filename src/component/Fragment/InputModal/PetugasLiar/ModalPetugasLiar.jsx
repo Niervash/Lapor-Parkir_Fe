@@ -3,89 +3,88 @@ import { Petugasliarmaps } from "../../maps/petugasliarmaps/petugasliarmaps";
 import FileInput from "../../../bases/FileInput/FileInput";
 import { ButtonReset } from "../../../bases/ButtonReset/ButtonReset";
 import {
-  dateFormatted,
   resetHandlePetugas,
+  Hariset,
 } from "../../../../config/Common-Function";
 import { addDataPetugas } from "../../../../config/network-data";
 import { toast } from "sonner";
 
 export const ModalPetugasLiar = ({ isOpen, onClose }) => {
-  const [latitude, setLatitude] = useState("");
-  const [TanggalDanWaktu, setTanggalDanWaktu] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [Identitas_Petugas, setIdentitasPetugas] = useState("");
-  const [lokasi, setLokasi] = useState("");
+  const [hari, setHari] = useState("");
   const [bukti, setBukti] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const [status] = useState("Liar");
-
   const [formData, setFormData] = useState({
     latitude: "",
     longitude: "",
-    Identitas_Petugas: "",
+    identitas_petugas: "",
     lokasi: "",
-    bukti: "",
-    TanggalDanWaktu: "",
   });
 
   useEffect(() => {
-    dateFormatted(setTanggalDanWaktu, setFormData);
+    Hariset(setHari, setFormData);
   }, []);
+
+  const handleFileChange = (file) => {
+    setBukti(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const data = new FormData();
-    data.append("lokasi", formData.lokasi);
-    data.append("latitude", formData.latitude);
-    data.append("longitude", formData.longitude);
-    data.append("identitas_petugas", formData.Identitas_Petugas);
-    data.append("tanggaldanwaktu", formData.TanggalDanWaktu);
-    data.append("status", status); // Jika diharapkan di server
-    if (formData.bukti) {
-      data.append("bukti", formData.bukti);
-    }
+    const formDataToSend = new FormData();
+    formDataToSend.append("latitude", formData.latitude);
+    formDataToSend.append("longitude", formData.longitude);
+    formDataToSend.append("identitas_petugas", formData.identitas_petugas);
+    formDataToSend.append("lokasi", formData.lokasi);
+    formDataToSend.append("hari", hari);
 
-    await addDataPetugas(data);
-
-    if (formData.bukti) {
-      data.append("bukti", formData.bukti);
+    if (bukti) {
+      formDataToSend.append("bukti", bukti);
     }
 
     try {
-      await addDataPetugas(data);
-      toast.success("Data berhasil ditambahkan!");
-      onClose(); // Close modal after successful submission
+      await addDataPetugas(formDataToSend);
+      setSuccessMessage("Pelaporan berhasil!");
+      handleReset();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Gagal menambahkan data!");
+      console.error("Error submitting data:", error);
+      toast.error("Terjadi kesalahan saat mengirim data.");
     }
   };
 
+  const handleLocationClick = (lat, lng) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: lat,
+      longitude: lng,
+    }));
+  };
+
   const handleReset = () => {
-    resetHandlePetugas(setFormData);
+    resetHandlePetugas(setFormData, setSuccessMessage);
+    setBukti(null);
   };
 
   return (
     <div>
-      {/* Backdrop with blur effect */}
       <div
         className={`${
           isOpen
             ? "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md"
             : "hidden"
         }`}
-        onClick={onClose} // Close the modal when clicking on the backdrop
+        onClick={onClose}
       ></div>
 
       <div
         className={`${
           isOpen ? "flex" : "hidden"
         } overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full`}
-        onClick={onClose} // Close modal when clicking outside
+        onClick={onClose}
       >
         <div
           className="relative p-4 w-full max-w-md max-h-full"
-          onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
@@ -117,7 +116,8 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
             </div>
             <div className="flex justify-center items-center h-[50vh] w-full z-0">
               <div className="w-full h-full rounded-lg overflow-hidden">
-                <Petugasliarmaps /> {/* Adding Maps */}
+                <Petugasliarmaps onLocationClick={handleLocationClick} />{" "}
+                {/* Adding Maps */}
               </div>
             </div>
             <form className="p-4 md:p-5" onSubmit={handleSubmit}>
@@ -150,19 +150,19 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                 </div>
                 <div className="col-span-2 sm:col-span-1">
                   <label
-                    htmlFor="Identitas_Petugas"
+                    htmlFor="identitas_petugas"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Identitas Petugas
                   </label>
                   <select
-                    id="Identitas_Petugas"
+                    id="identitas_petugas"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value={formData.Identitas_Petugas}
+                    value={formData.identitas_petugas}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        Identitas_Petugas: e.target.value,
+                        identitas_petugas: e.target.value,
                       })
                     }
                   >
@@ -189,6 +189,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                       setFormData({ ...formData, latitude: e.target.value })
                     }
                     required
+                    readOnly
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
@@ -209,20 +210,21 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                       setFormData({ ...formData, longitude: e.target.value })
                     }
                     required
+                    readOnly
                   />
                 </div>
                 <div className="col-span-2 ">
                   <label
-                    htmlFor="tanggal_dan_waktu"
+                    htmlFor="hari"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Tanggal dan Waktu
+                    hari
                   </label>
                   <input
                     type="text"
-                    id="tanggal_dan_waktu"
+                    id="hari"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                    value={TanggalDanWaktu}
+                    value={hari}
                     readOnly
                   />
                 </div>
