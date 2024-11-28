@@ -44,33 +44,26 @@ const router = createBrowserRouter([
   {
     path: "/user-dashboard/home",
     element: (
-      <ProtectedRoute allowedRoles={["user"]}>
+      
         <HomePelaporPage />
-      </ProtectedRoute>
     ),
   },
   {
     path: "/user-dashboard/parkir-liar",
     element: (
-      <ProtectedRoute allowedRoles={["user"]}>
-        <ParkirLiarpage />{" "}
-      </ProtectedRoute>
+        <ParkirLiarpage />
     ),
   },
   {
     path: "/user-dashboard/petugas-liar",
     element: (
-      <ProtectedRoute allowedRoles={["user"]}>
         <PetugasLiarpage />
-      </ProtectedRoute>
     ),
   },
   {
     path: "/user-dashboard/edit-profile",
     element: (
-      <ProtectedRoute allowedRoles={["user"]}>
         <EditProfileUser />
-      </ProtectedRoute>
     ),
   },
   // Admin Dashboard
