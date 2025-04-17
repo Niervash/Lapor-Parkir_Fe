@@ -1,7 +1,7 @@
 import React from "react";
 import { useSpring, animated } from "@react-spring/web";
 
-export const NumberStats = ({ n, label, className = "" }) => {
+export const NumberStats = ({ n, className = "" }) => {
   const { number } = useSpring({
     number: n,
     from: { number: 0 },
@@ -10,11 +10,10 @@ export const NumberStats = ({ n, label, className = "" }) => {
   });
 
   return (
-    <div className="flex flex-col items-center">
-      <animated.div className={`text-4xl font-bold ${className}`}>
-        {number.to((n) => n.toFixed(0))}
+    <div>
+      <animated.div className={`mb-2 font-bold  ${className}`}>
+        {n}
       </animated.div>
-      <p className="mt-2 text-gray-500 dark:text-gray-400">{label}</p>
     </div>
   );
 };

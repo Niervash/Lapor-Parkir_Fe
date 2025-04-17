@@ -1,135 +1,225 @@
-import React from "react";
-import SidebarSection from "../Fragment/SidebarSection";
-import FooterSection from "../Fragment/Dashboard/sidebar/FooterSection";
-import DropdownDashboard from "../Fragment/Dashboard/sidebar/DropdownDashboard";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { useState } from "react";
-import { useEffect } from "react";
-import { Footerdashboard } from "../Fragment/footerdashboard/footerdashboard";
-import { SpeedDial } from "../bases/SpeedDial/SpeedDial";
+import "leaflet/dist/leaflet.css";
+import { setLogout } from "../../config/SetItem";
+import { GetUserLoged } from "../../config/Auth/Auth";
+import defaultProfile from "../../../public/Logo/profil.jpg";
+import logo from "../../../public/Logo/1.png";
 
-const PelaporLayout = ({ children }) => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const PelaporLayout = ({
+  children,
+  LabelsBreadcrumb,
+  Breadcrumb,
+  ClassName,
+  DashboardAct,
+  ParkirAct,
+  PetugasAct,
+  ProfilAct,
+  bgClass = "bg-[url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/profile-layout-header.jpg')]",
+}) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+  const [profilePicture, setProfilepicture] = useState(
+    localStorage.getItem("profilePicture") || defaultProfile
+  );
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const sessionData = JSON.parse(sessionStorage.getItem("user"));
-    if (sessionData) {
-      setIsLoggedIn(true);
+    const getData = async () => {
+      try {
+        const result = await GetUserLoged();
+        if (result.foto_profil) {
+          setProfilepicture(result.foto_profil);
+          console.log(profilePicture);
+          localStorage.setItem("profilePicture", result.foto_profil);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+      }
+    };
+
+    if (profilePicture === defaultProfile) {
+      getData();
     }
+    const handleResize = () => {
+      setIsSidebarOpen(window.innerWidth >= 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleLogout = () => {
+    setLogout();
+    localStorage.removeItem("profilePicture");
+    window.location.href = "/";
+  };
+
   return (
-    <div className="flex flex-col min-h-screen ">
-      <nav className="fixed top-0 z-50 w-full p-2 drop-shadow-lg mb-2 bg-slate border-slate-700 dark:bg-slate-700 dark:border-slate-700">
-        <div className="px-3 py-3 lg:px-5 lg:pl-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center justify-start rtl:justify-end ">
-              <Link
-                to="/"
-                className="flex items-center px-4 space-x-3 rtl:space-x-reverse"
-              >
-                <img
-                  src="../../public/Logo/1.svg"
-                  className="h-8"
-                  alt="Flowbite Logo"
-                />
-                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-                  Lapor <span className="text-sky-300">Parkir</span>
-                </span>
-              </Link>
-            </div>
-            <div className="flex items-center">
-              <button
-                type="button"
-                onClick={toggleSidebar}
-                className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-              >
-                <RxHamburgerMenu className="md:hidden block text-white cursor-pointer" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-      <div className="z-50 shadow-md">
-        {isLoggedIn && <SpeedDial setIsLoggedIn={setIsLoggedIn} />}
-      </div>
+    <div className="m-0 font-sans text-base antialiased font-normal bg-white leading-default bg-gray-50 text-slate-500">
       <aside
-        className={`fixed top-0 left-0 z-40 w-64 h-screen  pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-slate-700 dark:border-slate-700 ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-        aria-label="Sidebar"
+        className={`fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 ${
+          isSidebarOpen ? "ml-6" : "-translate-x-full"
+        } bg-white border-0 drop-shadow-lg max-w-64 ease-nav-brand z-990 rounded-2xl left-0`}
+        aria-expanded={isSidebarOpen}
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-slate-700">
-          <ul className="space-y-2 font-medium">
-            <li>
+        {/* Header title */}
+        <div className="h-19">
+          <i
+            className="absolute top-0 right-0 p-4 opacity-50 cursor-pointer fas fa-times text-slate-400 xl:hidden"
+            onClick={toggleSidebar}
+          ></i>
+          <Link
+            className="block px-8 py-6 m-0 text-sm whitespace-nowrap text-slate-700"
+            to="/"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={logo}
+              className="mr-2 inline h-full max-w-full transition-all duration-200 ease-nav-brand max-h-8"
+              alt="main_logo"
+            />
+
+            <span className="text-black ml-4">
+              <span className="text-sky-400 font-bold">Lapor</span>{" "}
+              <span className="font-bold text-gray-500">Parkir</span>
+            </span>
+          </Link>
+        </div>
+        {/* End header title */}
+        <hr className="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
+        <div className="items-center block w-auto max-h-screen overflow-auto h-sidenav grow basis-full mt-5">
+          <ul className="flex flex-col pl-0 mb-0">
+            <li className="mt-0.5 w-full">
               <Link
-                to="/user-dashboard"
-                className="flex items-center mt-5 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-500 dark:hover:bg-white-700 group"
+                className={`py-2.7  ${DashboardAct} text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap  px-4 text-slate-700 transition-colors`}
+                to="/user dashboard/home"
               >
-                <svg
-                  className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 22 21"
-                >
-                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-                </svg>
-                <span className="ms-3">Dashboard</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/user-dashboard/home"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-500 group"
-              >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 18 18"
-                >
-                  <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Home</span>
-              </Link>
-            </li>
-            <DropdownDashboard />
-            {/* <li>
-              <Link
-                to="/user-dashboard/edit-profile"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-500 group"
-              >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 18"
-                >
-                  <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">
-                  Users Profile
+                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
+                  <i className="relative top-0 text-sm leading-normal text-blue-500 ni ni-tv-2"></i>
+                </div>
+                <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease hover:text-blue-500">
+                  Dashboard
                 </span>
               </Link>
-            </li> */}
+            </li>
+            <li className="w-full mt-4">
+              <h6 className="text-black pl-6 ml-2 text-xs font-bold leading-tight uppercase opacity-60">
+                Menu Pages
+              </h6>
+            </li>
+            <li className="mt-0.5 w-full">
+              <Link
+                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors mt-5 ${ParkirAct}`}
+                to="/user dashboard/parkir liar"
+              >
+                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
+                  <i className="relative top-0 text-sm leading-normal text-orange-500 ni ni-calendar-grid-58"></i>
+                </div>
+                <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
+                  PL Table's
+                </span>
+              </Link>
+            </li>
+            <li className="mt-0.5 w-full">
+              <Link
+                className={`py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${PetugasAct}`}
+                to="/user dashboard/petugas liar"
+              >
+                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
+                  <i className="relative top-0 text-sm leading-normal text-emerald-500 ni ni-calendar-grid-58"></i>
+                </div>
+                <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
+                  PTL Table's
+                </span>
+              </Link>
+            </li>
+            <li className="w-full mt-4">
+              <h6 className="text-black pl-6 ml-2 text-xs font-bold leading-tight uppercase opacity-60">
+                Account pages
+              </h6>
+            </li>
+            <li className="mt-0.5 w-full">
+              <Link
+                className={`text-white opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors ${ProfilAct} mt-5`}
+                to="/user dashboard/edit profile"
+              >
+                <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
+                  <i className="relative top-0 text-sm leading-normal text-slate-700 ni ni-single-02"></i>
+                </div>
+                <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
+                  Profile
+                </span>
+              </Link>
+            </li>
           </ul>
         </div>
+        <div className="mx-12">
+          <div className="pb-24"></div>
+          <button
+            onClick={handleLogout}
+            className="inline-block w-full px-5 py-2 mb-7 text-xs font-bold leading-normal text-center text-white capitalize transition-all ease-in rounded-lg shadow-md bg-slate-700 bg-150 hover:shadow-xs hover:-translate-y-px"
+          >
+            Sign Out
+          </button>
+        </div>
       </aside>
-      <div className="p-4 sm:ml-64  ">
-        <div className="p-4 border-gray-200 mt-14 ">{children}</div>
-        <footer className="bg-gray-800 text-white py-4 rounded-lg ">
-          <Footerdashboard />
-        </footer>
+      <div className={`absolute bg-y-50 w-full top-0 ${bgClass} min-h-75`}>
+        <span className="absolute top-0 left-0 w-full h-full bg-blue-500 opacity-60"></span>
       </div>
+      {/* Start content */}
+      <main className={ClassName}>
+        <nav
+          className="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all ease-in shadow-none duration-250 rounded-2xl lg:flex-nowrap lg:justify-start"
+          navbar-main
+          navbar-scroll="false"
+        >
+          {/* Start Breadcrumb */}
+          <div className="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
+            <nav>
+              <ol className="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
+                <li className="text-white opacity-50">Pages</li>
+                <li
+                  className="text-sm pl-2 capitalize leading-normal text-white before:float-left before:pr-2 before:text-white before:content-['/']"
+                  aria-current="page"
+                >
+                  {Breadcrumb}
+                </li>
+              </ol>
+              <h6 className="mb-0 font-bold text-white capitalize">
+                {LabelsBreadcrumb}
+              </h6>
+            </nav>
+            <div className="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
+              <div className="flex items-center md:ml-auto md:pr-4"></div>
+              <ul className="flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
+                <li>
+                  <button className="w-12 h-12 rounded-full border-4 border-emerald-400 flex items-center justify-center transition duration-300 ease-in-out hover:bg-emerald-100 drop-shadow-xl">
+                    <img
+                      src={defaultProfile}
+                      alt="User"
+                      className="w-10 h-10 rounded-full shadow-lg object-cover transition-opacity duration-300 ease-in-out hover:opacity-75"
+                    />
+                  </button>
+                </li>
+                <li className="flex items-center pl-4 xl:hidden">
+                  <button
+                    onClick={toggleSidebar}
+                    className="block p-0 text-sm text-white transition-all ease-nav-brand"
+                  >
+                    <div className="w-4.5 overflow-hidden">
+                      <RxHamburgerMenu />
+                    </div>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+        {children}
+      </main>
     </div>
   );
 };

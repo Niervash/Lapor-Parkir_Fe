@@ -12,7 +12,7 @@ export const ButtonInput = ({
     <div>
       <button
         type={type}
-        className={` shadow-xl mb-4 flex items-center text-white bg-blue-700 hover:bg-blue-800  font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none  ${className}`}
+        className={` shadow-xl mb-4 flex items-center text-white bg-blue-700 hover:bg-blue-800  font-medium rounded-lg text-sm px-4 py-2.5 focus:outline-none  ${className}`}
         onClick={onClick}
       >
         {icon && <span className="mr-2">{icon}</span>}

@@ -6,49 +6,33 @@ import { Petugaspetugasliar } from "../../../../Fragment/Table/TablePetugasParki
 import { Pagination } from "../../../../bases/Dashboard/Pagination/Pagination";
 import { ModalPetugasLiar } from "../../../../Fragment/InputModal/PetugasLiar/ModalPetugasLiar";
 import { PaginationPages } from "../../../../../config/Common-Function";
-import { getAlldataPetugas } from "../../../../../config/network-data";
 import { ToastNotif } from "../../../../bases/Toast/ToastNotif";
+import { StatsCardDashboard } from "../../../../Fragment/statistikCard/StatsCardDashboard";
+import { GetDataPetugas } from "../../../../../config/User/Pelaporan/PetugasLIar/PetugasLiar";
+import { GetItem } from "../../../../../config/SetItem";
+import { FaSearch } from "react-icons/fa";
 
 export const PetugasLiar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isparkirLiarModalOpen, setIsModalParkirLiarOpen] = useState(false);
+  const [ispetugasLiarModalOpen, setIsModalPpetugasLiarOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
 
-  // Mendapatkan userId dari session
-  const user = JSON.parse(sessionStorage.getItem("user"));
-  const userId = user ? user.id : null;
-
   const fetchData = async () => {
-    if (userId) {
-      try {
-        const response = await getAlldataPetugas(userId);
-        setData(response);
-
-        if (!error) {
-          setToastMessage("Data berhasil ditambahkan!");
-          setToastType("success");
-          setShowToast(true);
-        } else {
-          setToastMessage(
-            typeof data === "string"
-              ? data
-              : "Fetching data gagal. Silakan coba lagi."
-          );
-          setToastType("error");
-          setShowToast(true);
-        }
-      } catch (err) {
-        setError("Failed to fetch data. Please try again later.");
-        setToastMessage("Failed to fetch data. Please try again later.");
-        setToastType("error");
-        setShowToast(true);
-      }
+    const { Id_Pengguna } = await GetItem();
+    try {
+      const response = await GetDataPetugas(Id_Pengguna);
+      setData(response.data.rows);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
     }
   };
 
@@ -58,51 +42,72 @@ export const PetugasLiar = () => {
 
   useEffect(() => {
     fetchData();
-  }, [userId]);
+  }, []);
 
-  // Setup pagination
-  const { totalPages, currentItems } = PaginationPages(
-    data,
-    currentPage,
-    itemsPerPage
+  const totalPages = Math.ceil(
+    (data && Array.isArray(data) ? data.length : 0) / itemsPerPage
+  );
+  const currentItems = (data && Array.isArray(data) ? data : []).slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
-  // Handle modal toggle
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
   };
 
-  // Handle modal parkir liar toggle
-  const handleModalParkir = () => {
-    setIsModalParkirLiarOpen(!isparkirLiarModalOpen);
+  const handleModalpetugas = () => {
+    setIsModalPpetugasLiarOpen(!ispetugasLiarModalOpen);
   };
 
-  // Breadcrumb items
-  const breadcrumbItems = [
-    { label: "Dashboard" },
-    { label: "Petugas Liar", link: "#" },
-  ];
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4">
+        <p className="text-gray-600 text-lg mb-2">No results found</p>
+        <FaSearch />
+        <p className="text-gray-500 text-sm">Try again.</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <Breadcrumbs items={breadcrumbItems} />
-
+    <div className="w-full px-6 py-6 mx-auto">
+      <StatsCardDashboard />
       <div className="mt-4">
         <ButtonInput
           text="Tambah Data"
-          onClick={handleModalParkir}
+          onClick={handleModalpetugas}
           className="shadow-xl"
           icon={<IoIosAdd />}
         />
-        <Petugaspetugasliar
-          items={currentItems}
-          onModalToggle={handleModalToggle}
-        />
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        {data.length > 0 ? (
+          <>
+            <Petugaspetugasliar
+              items={currentItems}
+              onModalToggle={handleModalToggle}
+            />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-4">
+            <p className="text-gray-600 text-lg mb-2 mt-20">
+              No data available
+            </p>
+            <p className="text-gray-500 text-sm">Please add new data.</p>
+          </div>
+        )}
         {showToast && (
           <ToastNotif
             message={toastMessage}
@@ -111,8 +116,8 @@ export const PetugasLiar = () => {
           />
         )}
         <ModalPetugasLiar
-          isOpen={isparkirLiarModalOpen}
-          onClose={handleModalParkir}
+          isOpen={ispetugasLiarModalOpen}
+          onClose={handleModalpetugas}
         />
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastNotif } from "../../../bases/Toast/ToastNotif";
-import { Islogin } from "../../../../config/network-data";
+import { Islogin } from "../../../../config/Auth/Auth";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");

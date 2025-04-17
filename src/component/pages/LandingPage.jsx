@@ -11,7 +11,7 @@ export const LandingPage = () => {
       <LandingLayout>
         <Home />
         <Stats />
-        <About />
+        {/* <About /> */}
       </LandingLayout>
     </div>
   );

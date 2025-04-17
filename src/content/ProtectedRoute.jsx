@@ -1,13 +1,19 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
-  const userData = JSON.parse(sessionStorage.getItem("user"));
+const ProtectedRoute = ({ children, requiredRole }) => {
+  // Mengambil data dari sessionStorage
+  const token = sessionStorage.getItem("Tokens");
+  const userRole = sessionStorage.getItem("role");
 
-  const isAuthorized = userData && allowedRoles.includes(userData.role);
+  const isAuthenticated = token;
 
-  if (!userData || !isAuthorized) {
-    return <Navigate to="/" />;
+  if (!isAuthenticated) {
+    return <Navigate to={"/login"} />;
+  }
+
+  if (requiredRole && userRole !== requiredRole) {
+    return <Navigate to={"/"} />; // Redirect jika role tidak sesuai
   }
 
   return children;

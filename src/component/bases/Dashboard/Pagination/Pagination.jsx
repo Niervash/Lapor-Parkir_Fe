@@ -14,7 +14,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             key={i}
             onClick={() => onPageChange(i)}
             className={`px-4 py-2 ${
-              currentPage === i ? "bg-blue-500 text-white" : "bg-gray-200"
+              currentPage === i ? "bg-blue-500 text-white " : "bg-gray-200"
             } rounded-lg mx-1`}
           >
             {i}
@@ -98,7 +98,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           disabled={currentPage === 1}
           onClick={() => onPageChange(currentPage - 1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg mr-2"
+          className="px-4 py-2 bg-blue-400 drop-shadow-xl text-white rounded-xl mr-2 hover:bg-blue-600"
         >
           <GrPrevious />
         </button>
@@ -106,7 +106,7 @@ export const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         <button
           disabled={currentPage === totalPages}
           onClick={() => onPageChange(currentPage + 1)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg ml-2"
+          className="px-4 py-2 bg-blue-400 drop-shadow-xl text-white rounded-xl mr-2 hover:bg-blue-600"
         >
           <GrNext />
         </button>

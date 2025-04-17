@@ -1,39 +1,48 @@
 import React, { useState, useEffect } from "react";
 import { NumberStats } from "../NumberStats/NumberStats";
-import { StatsFetch } from "../../../config/network-data";
+import { StatusCard } from "../../bases/CardStats/StatusCard";
+import { fetchDashboardData } from "../../../config/Auth/Auth";
 
 export const StatsCardDashboard = () => {
-  const [data, setData] = useState({
-    userCount: 0,
-    totalApprove: 0,
-    laporanPetugasCount: 0,
-    laporanParkirCount: 0,
-  });
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    StatsFetch(setData);
+    const FetchData = async () => {
+      try {
+        const result = await fetchDashboardData();
+        console.log(result);
+        setData(result);
+      } catch (error) {
+        setError(error.message || "An error occurred");
+      }
+    };
+
+    FetchData();
   }, []);
+
   return (
-    <div className="max-w-screen-xl px-4 pb-5 mx-auto lg:pb-16">
-      <h1 className="text-2xl ml-10 font-medium text-left mb-8 italic text-slate-50 mt-3">
-        Stats Overview
-      </h1>
-      <div className="grid grid-cols-2 gap-8 text-gray-800 sm:gap-12 sm:grid-cols-3 lg:grid-cols-4 dark:text-gray-400">
-        <a className="flex items-center lg:justify-center">
-          <NumberStats n={data.totalApprove} label="Pelaporan Terpublikasi" />
-        </a>
-        <a className="flex items-center lg:justify-center">
-          <NumberStats
-            n={data.laporanParkirCount}
-            label="Pelaporan Parkir Liar"
-          />
-        </a>
-        <a className="flex items-center lg:justify-center">
-          <NumberStats
-            n={data.laporanPetugasCount}
-            label="Pelaporan Petugas Parkir Liar"
-          />
-        </a>
+    <div className="flex flex-wrap -mx-3">
+      <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+        <StatusCard label="User Count">
+          <NumberStats n={data?.userCount || 0} />
+        </StatusCard>
+      </div>
+      <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+        <StatusCard label="Report Accepted">
+          <NumberStats n={data?.totalApprove || 0} />
+        </StatusCard>
+      </div>
+      <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+        <StatusCard label="PTL Report">
+          <NumberStats n={data?.laporanPetugasCount || 0} />
+        </StatusCard>
+      </div>
+      <div className="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+        <StatusCard label="PL Report">
+          <NumberStats n={data?.laporanParkirCount || 0} />
+        </StatusCard>
       </div>
     </div>
   );

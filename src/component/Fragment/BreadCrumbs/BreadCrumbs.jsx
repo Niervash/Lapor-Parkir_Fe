@@ -4,42 +4,33 @@ import PropTypes from "prop-types";
 
 export const Breadcrumbs = ({ items }) => {
   return (
-    <nav className="flex" aria-label="Breadcrumb">
-      <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+    <nav>
+      <ol class="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
         {items.map((item, index) => (
-          <li key={index} className="inline-flex items-center">
+          <li
+            key={index}
+            class="text-sm pl-2 capitalize leading-normal text-white before:float-left before:pr-2 before:text-white before:content-['']"
+            aria-current="page"
+          >
             {item.link ? (
-              <a
-                href={item.link}
-                className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-gray-500 dark:text-gray-400 dark:hover:text-white"
-              >
-                {index > 0 && (
-                  <svg
-                    className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 6 10"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m1 9 4-4-4-4"
-                    />
-                  </svg>
-                )}
+              <a className="text-white opacity-50" href={item.link}>
+                {index > 0 && <span>/</span>}
                 {item.label}
               </a>
             ) : (
-              <span className="ms-1 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400">
+              <span
+                className="text-sm pl-2 capitalize leading-normal text-white before:float-left before:pr-2 before:text-white before:content-['/']"
+                aria-current="page"
+              >
                 {item.label}
               </span>
             )}
           </li>
         ))}
       </ol>
+      <h6 class="mb-0 font-bold text-white capitalize">
+        {items[items.length - 1]?.label}
+      </h6>
     </nav>
   );
 };

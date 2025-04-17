@@ -7,7 +7,9 @@ import { ButtonInput } from "../../../../bases/buttoninput/buttoninput";
 import { Pagination } from "../../../../bases/Dashboard/Pagination/Pagination";
 import { ModalParkirLiar } from "../../../../Fragment/InputModal/ParkirLiar/ModalParkirLiar";
 import { ToastNotif } from "../../../../bases/Toast/ToastNotif";
-import { getAlldataParkir } from "../../../../../config/network-data";
+import { StatsCardDashboard } from "../../../../Fragment/statistikCard/StatsCardDashboard";
+import { getAlldataParkir } from "../../../../../config/User/Pelaporan/ParkirLIar/ParkirLIar";
+import { GetItem } from "../../../../../config/SetItem";
 
 export const ParkirLiar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,38 +18,22 @@ export const ParkirLiar = () => {
   const [toastMessage, setToastMessage] = useState("");
   const [toastType, setToastType] = useState("success");
   const [data, setData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const user = JSON.parse(sessionStorage.getItem("user")); // Ambil userId dari session
-  const userId = user ? user.idPengguna : null;
-
   const fetchData = async () => {
-    if (userId) {
-      try {
-        const response = await getAlldataParkir(userId);
-        setData(response);
-
-        if (!error) {
-          setToastMessage("Data berhasil ditambahkan!");
-          setToastType("success");
-          setShowToast(true);
-        } else {
-          setToastMessage(
-            typeof data === "string"
-              ? data
-              : "Fetching data gagal. Silakan coba lagi."
-          );
-          setToastType("error");
-          setShowToast(true);
-        }
-      } catch (err) {
-        setError("Failed to fetch data. Please try again later.");
-        setToastMessage("Failed to fetch data. Please try again later.");
-        setToastType("error");
-        setShowToast(true);
-      }
+    const { Id_Pengguna } = await GetItem();
+    console.log(Id_Pengguna);
+    try {
+      const response = await getAlldataParkir(Id_Pengguna);
+      console.log(response.data);
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
     }
   };
 
@@ -57,7 +43,7 @@ export const ParkirLiar = () => {
 
   useEffect(() => {
     fetchData();
-  }, [userId]);
+  }, []);
 
   const totalPages = Math.ceil(
     (data && Array.isArray(data) ? data.length : 0) / itemsPerPage
@@ -75,31 +61,51 @@ export const ParkirLiar = () => {
     setIsModalParkirLiarOpen(!isparkirLiarModalOpen);
   };
 
-  const breadcrumbItems = [
-    { label: "Dashboard" },
-    { label: "Parkir Liar", link: "#" },
-  ];
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4">
+        <p className="text-gray-600 text-lg mb-2">No results found</p>
+        <p className="text-gray-500 text-sm">Try again.</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <Breadcrumbs items={breadcrumbItems} />
-
+    <div className="w-full px-6 py-6 mx-auto">
+      <StatsCardDashboard />
       <div className="mt-4">
         <ButtonInput
           text="Tambah Data"
           onClick={handleModalParkir}
-          className="shadow-xl"
+          className="shadow-xl "
           icon={<IoIosAdd />}
         />
-        <TableParkirLiar
-          items={currentItems}
-          onModalToggle={handleModalToggle}
-        />
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        {data.length > 0 ? (
+          <>
+            <TableParkirLiar
+              items={currentItems}
+              onModalToggle={handleModalToggle}
+            />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-4">
+            <p className="text-gray-600 text-lg mb-2 ">No data available</p>
+            <p className="text-gray-500 text-sm">Please add new data.</p>
+          </div>
+        )}
         {showToast && (
           <ToastNotif
             message={toastMessage}

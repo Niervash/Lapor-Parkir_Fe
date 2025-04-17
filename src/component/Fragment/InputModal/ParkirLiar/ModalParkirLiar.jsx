@@ -2,105 +2,161 @@ import React, { useState, useEffect } from "react";
 import FileInput from "../../../bases/FileInput/FileInput";
 import { ButtonReset } from "../../../bases/ButtonReset/ButtonReset";
 import {
-  resetHandlePetugas,
   Hariset,
+  resetHandleParkir,
   Waktuset,
 } from "../../../../config/Common-Function";
-import { addDataParkir } from "../../../../config/network-data";
-import ParkirLiarmaps from "../../maps/parkirliarmaps/parkirliarmaps";
+import { AddDataParkir } from "../../../../config/User/Pelaporan/ParkirLIar/ParkirLIar";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  Popup,
+} from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Icon untuk marker lokasi pengguna
+const userIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 export const ModalParkirLiar = ({ isOpen, onClose }) => {
-  const [waktu, SetWaktu] = useState(" ");
-  const [hari, SetHari] = useState(" ");
-  const [successMessage, setSuccessMessage] = useState(" ");
-  const [bukti, setBukti] = useState("null"); // Initialize Bukti as null
-
-  const [formData, setFormData] = useState({
-    latitude: "",
-    longitude: "",
-    deskripsi_masalah: "",
-    lokasi: "",
-    jenis_kendaraan: "",
-    waktu: "",
-    hari: "",
-  });
+  const [tanggaldanwaktu, setWaktu] = useState("");
+  const [hari, setHari] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [bukti, setBukti] = useState(null);
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [deskripsi_masalah, setDeskripsiMasalah] = useState("");
+  const [jenis_kendaraan, setJenisKendaraan] = useState("");
+  const [lokasi, setLokasi] = useState("");
+  const [userLocation, setUserLocation] = useState(null); // State untuk lokasi pengguna
 
   useEffect(() => {
-    Hariset(SetHari, setFormData);
-    Waktuset(SetWaktu, setFormData);
+    Hariset(setHari);
+    Waktuset(setWaktu);
   }, []);
 
   const handleReset = () => {
-    resetHandlePetugas(setFormData, setSuccessMessage);
-    setBukti(null); // Reset Bukti to null
+    resetHandleParkir({
+      setLatitude,
+      setLongitude,
+      setDeskripsiMasalah,
+      setJenisKendaraan,
+      setLokasi,
+      setBukti,
+      setSuccessMessage,
+    });
+    setUserLocation(null); // Reset lokasi pengguna
   };
 
   const handleLocationClick = (lat, lng) => {
-    setFormData((prev) => ({
-      ...prev,
-      latitude: lat,
-      longitude: lng,
-    }));
+    setLatitude(lat);
+    setLongitude(lng);
   };
 
   const handleFileChange = (file) => {
-    setBukti(file); // Update Bukti state when file is selected
-    setFormData((prev) => ({
-      ...prev,
-      bukti: file.name, // Update Bukti field in formData
-    }));
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBukti(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  async function submitHandel(e) {
+  const submitHandel = async (e) => {
     e.preventDefault();
 
-    const formDataToSend = new FormData();
-    for (const key in formData) {
-      formDataToSend.append(key, formData[key]);
+    if (!bukti) {
+      alert("Harap unggah bukti terlebih dahulu!");
+      return;
     }
-
-    if (bukti) {
-      formDataToSend.append("bukti", bukti); // Append file if it exists
+    if (
+      !latitude ||
+      !longitude ||
+      !deskripsi_masalah ||
+      !lokasi ||
+      !jenis_kendaraan ||
+      !tanggaldanwaktu ||
+      !hari
+    ) {
+      alert("Harap isi semua field yang diperlukan!");
+      return;
     }
-
     try {
-      const response = await addDataParkir(formDataToSend);
+      await AddDataParkir({
+        latitude,
+        longitude,
+        deskripsi_masalah,
+        lokasi,
+        bukti,
+        jenis_kendaraan,
+        tanggaldanwaktu,
+        hari,
+      });
       setSuccessMessage("Pelaporan berhasil!");
-      handleReset(); // Reset form after successful submission
     } catch (error) {
       setSuccessMessage("Gagal menambahkan pelaporan.");
     }
-  }
+  };
+
+  // Fungsi untuk mendapatkan lokasi pengguna
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation([latitude, longitude]);
+          setLatitude(latitude);
+          setLongitude(longitude);
+        },
+        (error) => {
+          console.error("Error getting user location:", error);
+          alert("Gagal mendapatkan lokasi. Pastikan GPS aktif.");
+        }
+      );
+    } else {
+      alert("Browser tidak mendukung geolocation.");
+    }
+  };
+
   return (
     <div>
-      {/* Backdrop with blur effect */}
       <div
         className={`${
           isOpen
             ? "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md"
             : "hidden"
         }`}
-        onClick={onClose} // Close the modal when clicking on the backdrop
+        onClick={onClose}
       ></div>
 
       <div
         className={`${
           isOpen ? "flex" : "hidden"
         } overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full`}
-        onClick={onClose} // Close modal when clicking outside
+        onClick={onClose}
       >
         <div
           className="relative p-4 w-full max-w-md max-h-full"
-          onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
+          onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Tambah Data
-              </h3>
+          <div className="relative bg-white rounded-lg shadow">
+            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+              <h3 className="text-lg font-bold text-gray-600">Tambah Data</h3>
               <button
                 type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                className="text-gray-400 bg-transparent hover:bg-gray-300 hover:text-gray-900 rounded-full border border-2 text-sm w-8 h-8 ms-auto inline-flex justify-center items-center "
                 onClick={onClose}
               >
                 <svg
@@ -121,30 +177,48 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
-            <div className="flex justify-center items-center h-[50vh] w-full z-0">
-              <div className="w-full h-full rounded-lg overflow-hidden">
-                <ParkirLiarmaps onLocationClick={handleLocationClick} />
+            <div className="flex justify-center items-center h-[50vh] p-5 z-40">
+              <div className="w-full h-full rounded-lg overflow-hidden shadow-lg border">
+                <div className=" w-full h-full md:h-full  md:w-full">
+                  {" "}
+                  <MapContainer
+                    center={[-6.2, 106.816666]}
+                    zoom={13}
+                    className="h-full w-full"
+                    whenCreated={(map) =>
+                      setTimeout(() => map.invalidateSize(), 99999)
+                    }
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    />
+                    {userLocation && (
+                      <Marker position={userLocation} icon={userIcon}>
+                        <Popup>Lokasi Anda</Popup>
+                      </Marker>
+                    )}
+
+                    <MapClickHandler onLocationClick={handleLocationClick} />
+                  </MapContainer>
+                </div>
               </div>
             </div>
+
             <form className="p-4 md:p-5" onSubmit={submitHandel}>
               <div className="grid gap-4 mb-4 grid-cols-2">
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="jenis_kendaraan"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Jenis Kendaraan
                   </label>
                   <select
                     id="jenis_kendaraan"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value={formData.jenis_kendaraan}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        jenis_kendaraan: e.target.value,
-                      })
-                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 text-black focus:ring-gray-50 focus:border-gray-50 "
+                    value={jenis_kendaraan}
+                    onChange={(e) => setJenisKendaraan(e.target.value)}
                   >
                     <option value="">Pilih Kendaraan</option>
                     <option value="Motor">Motor</option>
@@ -154,20 +228,15 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="Lokasi"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Lokasi
                   </label>
                   <select
                     id="lokasi"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value={formData.lokasi}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        lokasi: e.target.value,
-                      })
-                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 text-black focus:ring-gray-50 focus:border-gray-50 "
+                    value={lokasi}
+                    onChange={(e) => setLokasi(e.target.value)}
                   >
                     <option value="">Pilih Lokasi</option>
                     <option value="Jl. H. Agus Salim">Jl. H. Agus Salim</option>
@@ -185,7 +254,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="latitude"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Latitude
                   </label>
@@ -193,12 +262,10 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                     type="number"
                     name="latitude"
                     id="latitude"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                     placeholder="Enter Latitude"
-                    value={formData.latitude}
-                    onChange={(e) =>
-                      setFormData({ ...formData, latitude: e.target.value })
-                    }
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
                     readOnly
                     required
                   />
@@ -206,7 +273,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="longitude"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Longitude
                   </label>
@@ -214,12 +281,10 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                     type="number"
                     name="longitude"
                     id="longitude"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                     placeholder="Enter Longitude"
-                    value={formData.longitude}
-                    onChange={(e) =>
-                      setFormData({ ...formData, longitude: e.target.value })
-                    }
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
                     readOnly
                     required
                   />
@@ -227,20 +292,15 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="Identitas_Petugas"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Deskripsi Masalah
                   </label>
                   <select
                     id="deskripsi_masalah"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value={formData.deskripsi_masalah}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        deskripsi_masalah: e.target.value,
-                      })
-                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 text-black focus:ring-gray-50 focus:border-gray-50"
+                    value={deskripsi_masalah}
+                    onChange={(e) => setDeskripsiMasalah(e.target.value)}
                   >
                     <option value="">Pilih Deskripsi</option>
                     <option value="Parkir Di Trototar">
@@ -269,53 +329,53 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                 <div className="col-span-2 ">
                   <label
                     htmlFor="Waktu"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Waktu
                   </label>
                   <input
                     type="text"
                     id="waktu"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
-                    value={waktu}
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                    value={tanggaldanwaktu}
                     readOnly
                   />
                 </div>
                 <div className="col-span-2 ">
                   <label
                     htmlFor="hari"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Hari
                   </label>
                   <input
                     type="text"
                     id="hari"
-                    className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                    className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                     value={hari}
                     readOnly
                   />
                 </div>
                 <div className="col-span-2 mb-2">
-                  <FileInput
-                    htmlFor="bukti"
-                    id="bukti"
-                    accept="image/*"
-                    Label="Bukti"
-                    onChange={handleFileChange} // Use handleFileChange function
-                  />
+                  <FileInput onChange={handleFileChange} />
                 </div>
               </div>
               <div className="flex justify-between">
                 <button
+                  type="button"
+                  className="inline-block px-4 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-green-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
+                  onClick={getLocation}
+                >
+                  Dapatkan Lokasi Saya
+                </button>
+                <button
                   type="submit"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                  className="inline-block px-4 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-blue-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
                 >
                   Submit Pelaporan
                 </button>
-
                 <ButtonReset
-                  className="focus:outline-none text-white bg-red-400 hover:bg-red-400 focus:ring-2 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                  className="inline-block px-5 py-2 mb-4 ml-auto font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-red-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
                   onReset={handleReset}
                 />
               </div>
@@ -328,4 +388,15 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+};
+
+// Komponen untuk menangani klik pada peta
+const MapClickHandler = ({ onLocationClick }) => {
+  useMapEvents({
+    click: (e) => {
+      const { lat, lng } = e.latlng;
+      onLocationClick(lat, lng);
+    },
+  });
+  return null;
 };

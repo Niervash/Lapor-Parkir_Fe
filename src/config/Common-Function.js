@@ -1,43 +1,66 @@
-const resetHandlePetugas = (setFormData, setSuccess) => {
-  setFormData({
-    latitude: "",
-    longitude: "",
-    identitas_Petugas: "",
-    lokasi: "",
-    bukti: null,
-  });
+import { GetItem } from "./SetItem";
 
-  setSuccess("Data petugas berhasil dihapus!");
+const resetHandlePetugas = (setters) => {
+  const {
+    setLatitude,
+    setLongitude,
+    setIdentitaspetugas,
+    setLokasi,
+    setBukti,
+  } = setters;
 
-  return true;
+  setLatitude("");
+  setLongitude("");
+  setIdentitaspetugas("");
+  setLokasi("");
+  setBukti(null);
+
+  setSuccessMessage("Data Pelaporan berhasil Reset!");
 };
 
-const Waktuset = (setWaktu, setFormData) => {
+const resetHandleParkir = (setters) => {
+  const {
+    setLatitude,
+    setLongitude,
+    setDeskripsiMasalah,
+    setJenisKendaraan,
+    setLokasi,
+    setBukti,
+    setSuccessMessage,
+  } = setters;
+
+  setLatitude("");
+  setLongitude("");
+  setDeskripsiMasalah("");
+  setJenisKendaraan("");
+  setLokasi("");
+  setBukti(null);
+
+  setSuccessMessage("Data Pelaporan berhasil Reset!");
+};
+
+const Waktuset = (setWaktu) => {
   const now = new Date();
-  const formattedTime = now.toLocaleTimeString("id-ID", {
-    timeZone: "Asia/Makassar",
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  setWaktu(formattedTime);
-  setFormData((prev) => ({
-    ...prev,
-    waktu: formattedTime,
-  }));
+
+  // Format tanggal dan waktu sesuai kebutuhan
+  const day = String(now.getDate()).padStart(2, "0"); // Hari (DD)
+  const month = String(now.getMonth() + 1).padStart(2, "0"); // Bulan (MM)
+  const year = now.getFullYear(); // Tahun (YYYY)
+  const hours = String(now.getHours()).padStart(2, "0"); // Jam (HH)
+  const minutes = String(now.getMinutes()).padStart(2, "0"); // Menit (MM)
+
+  // Gabungkan dalam format yang diinginkan
+  const formattedDateTime = `${day}/${month}/${year}, ${hours}:${minutes}`;
+  setWaktu(formattedDateTime);
 };
 
-const Hariset = (setHari, setFormData) => {
+const Hariset = (setHari) => {
   const now = new Date();
   const formattedDay = now.toLocaleDateString("id-ID", {
-    weekday: "long", // Menghasilkan nama hari dalam bentuk panjang
+    weekday: "long",
     timeZone: "Asia/Makassar",
   });
   setHari(formattedDay);
-  setFormData((prev) => ({
-    ...prev,
-    hari: formattedDay,
-  }));
 };
 
 const PaginationPages = (data, currentPage, itemsPerPage) => {
@@ -56,4 +79,10 @@ const PaginationPages = (data, currentPage, itemsPerPage) => {
   };
 };
 
-export { resetHandlePetugas, PaginationPages, Waktuset, Hariset };
+export {
+  resetHandlePetugas,
+  PaginationPages,
+  Waktuset,
+  Hariset,
+  resetHandleParkir,
+};

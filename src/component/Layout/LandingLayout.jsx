@@ -15,7 +15,7 @@ const LandingLayout = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <NavbarSection isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
 
-      <div className="flex-grow bg-slate-700 dark:bg-gradient-to-b from-slate-700 p-4">
+      <div className="flex-grow bg-sky-600 p-4">
         {React.Children.map(children, (child) => {
           return React.cloneElement(child, { isLoggedIn, setIsLoggedIn });
         })}

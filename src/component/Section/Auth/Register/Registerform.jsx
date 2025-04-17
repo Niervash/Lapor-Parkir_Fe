@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
-import { IsRegister } from "../../../../config/network-data";
+import { IsRegister } from "../../../../config/Auth/Auth";
 
 export const RegisterForm = () => {
   const [errorMsg, setErrorMsg] = useState("");

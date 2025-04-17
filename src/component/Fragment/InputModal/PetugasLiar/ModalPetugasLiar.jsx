@@ -5,65 +5,80 @@ import { ButtonReset } from "../../../bases/ButtonReset/ButtonReset";
 import {
   resetHandlePetugas,
   Hariset,
+  Waktuset,
 } from "../../../../config/Common-Function";
-import { addDataPetugas } from "../../../../config/network-data";
 import { toast } from "sonner";
+import { AddDataPetugas } from "../../../../config/User/Pelaporan/PetugasLIar/PetugasLiar";
 
 export const ModalPetugasLiar = ({ isOpen, onClose }) => {
   const [hari, setHari] = useState("");
+  const [tanggaldanwaktu, setWaktu] = useState("");
   const [bukti, setBukti] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const [formData, setFormData] = useState({
-    latitude: "",
-    longitude: "",
-    identitas_petugas: "",
-    lokasi: "",
-  });
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [identitas_petugas, setIdentitaspetugas] = useState("");
+  const [lokasi, setLokasi] = useState("");
 
   useEffect(() => {
-    Hariset(setHari, setFormData);
+    Hariset(setHari);
+    Waktuset(setWaktu);
   }, []);
 
-  const handleFileChange = (file) => {
-    setBukti(file);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("latitude", formData.latitude);
-    formDataToSend.append("longitude", formData.longitude);
-    formDataToSend.append("identitas_petugas", formData.identitas_petugas);
-    formDataToSend.append("lokasi", formData.lokasi);
-    formDataToSend.append("hari", hari);
-
-    if (bukti) {
-      formDataToSend.append("bukti", bukti);
-    }
-
-    try {
-      await addDataPetugas(formDataToSend);
-      setSuccessMessage("Pelaporan berhasil!");
-      handleReset();
-    } catch (error) {
-      console.error("Error submitting data:", error);
-      toast.error("Terjadi kesalahan saat mengirim data.");
-    }
+  const handleReset = () => {
+    resetHandlePetugas({
+      setLatitude,
+      setLongitude,
+      setIdentitaspetugas,
+      setLokasi,
+      setBukti,
+      setSuccessMessage,
+    });
   };
 
   const handleLocationClick = (lat, lng) => {
-    setFormData((prev) => ({
-      ...prev,
-      latitude: lat,
-      longitude: lng,
-    }));
+    setLatitude(lat);
+    setLongitude(lng);
   };
 
-  const handleReset = () => {
-    resetHandlePetugas(setFormData, setSuccessMessage);
-    setBukti(null);
+  const handleFileChange = (file) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBukti(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
+
+  async function submitHandel(e) {
+    e.preventDefault();
+
+    if (!bukti) {
+      alert("Harap unggah bukti terlebih dahulu!");
+      return;
+    }
+    if (!latitude || !longitude || !identitas_petugas || !lokasi || !hari) {
+      alert("Harap isi semua field yang diperlukan!");
+      return;
+    }
+    console.log("File siap diunggah:", bukti);
+    try {
+      await AddDataPetugas({
+        lokasi,
+        latitude,
+        longitude,
+        identitas_petugas,
+        tanggaldanwaktu,
+        hari,
+        bukti,
+      });
+      setSuccessMessage("Pelaporan berhasil!");
+    } catch (error) {
+      console.error("Error response:", error.response);
+      setSuccessMessage("Gagal menambahkan pelaporan.");
+    }
+  }
 
   return (
     <div>
@@ -86,14 +101,12 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
           className="relative p-4 w-full max-w-md max-h-full"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Tambah Data
-              </h3>
+          <div className="relative bg-white rounded-lg shadow ">
+            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
+              <h3 className="text-lg font-bold text-gray-600 ">Tambah Data</h3>
               <button
                 type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                className="text-gray-400 bg-transparent hover:bg-gray-300 hover:text-gray-900 rounded-full border border-2 text-sm w-8 h-8 ms-auto inline-flex justify-center items-center "
                 onClick={onClose}
               >
                 <svg
@@ -114,28 +127,25 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                 <span className="sr-only">Close modal</span>
               </button>
             </div>
-            <div className="flex justify-center items-center h-[50vh] w-full z-0">
-              <div className="w-full h-full rounded-lg overflow-hidden">
+            <div className="flex justify-center items-center h-[50vh] p-5 w-full z-0">
+              <div className="w-full h-full rounded-lg overflow-hidden shadow-lg border border-2 border-gray-100">
                 <Petugasliarmaps onLocationClick={handleLocationClick} />{" "}
-                {/* Adding Maps */}
               </div>
             </div>
-            <form className="p-4 md:p-5" onSubmit={handleSubmit}>
+            <form className="p-4 md:p-5" onSubmit={submitHandel}>
               <div className="grid gap-4 mb-4 grid-cols-2">
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="lokasi"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Lokasi
                   </label>
                   <select
                     id="lokasi"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value={formData.lokasi}
-                    onChange={(e) =>
-                      setFormData({ ...formData, lokasi: e.target.value })
-                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 text-black focus:ring-gray-50 focus:border-gray-50 "
+                    value={lokasi}
+                    onChange={(e) => setLokasi(e.target.value)}
                   >
                     <option value="">Pilih Lokasi</option>
                     <option value="Pusat Perbelanjaan">
@@ -151,20 +161,15 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="identitas_petugas"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Identitas Petugas
                   </label>
                   <select
                     id="identitas_petugas"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value={formData.identitas_petugas}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        identitas_petugas: e.target.value,
-                      })
-                    }
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full p-2.5 text-black focus:ring-gray-50 focus:border-gray-50"
+                    value={identitas_petugas}
+                    onChange={(e) => setIdentitaspetugas(e.target.value)}
                   >
                     <option value="">Pilih Identitas Petugas</option>
                     <option value="Ada">Ada</option>
@@ -174,7 +179,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="latitude"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Latitude
                   </label>
@@ -182,20 +187,18 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                     type="number"
                     name="latitude"
                     id="latitude"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                     placeholder="Enter Latitude"
-                    value={formData.latitude}
-                    onChange={(e) =>
-                      setFormData({ ...formData, latitude: e.target.value })
-                    }
-                    required
+                    value={latitude}
+                    onChange={(e) => setLatitude(e.target.value)}
                     readOnly
+                    required
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
                   <label
                     htmlFor="longitude"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
                     Longitude
                   </label>
@@ -203,53 +206,63 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                     type="number"
                     name="longitude"
                     id="longitude"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                     placeholder="Enter Longitude"
-                    value={formData.longitude}
-                    onChange={(e) =>
-                      setFormData({ ...formData, longitude: e.target.value })
-                    }
+                    value={longitude}
+                    onChange={(e) => setLongitude(e.target.value)}
+                    readOnly
                     required
+                  />
+                </div>
+                <div className="col-span-2 ">
+                  <label
+                    htmlFor="Waktu"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
+                  >
+                    Waktu
+                  </label>
+                  <input
+                    type="text"
+                    id="waktu"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                    value={tanggaldanwaktu}
                     readOnly
                   />
                 </div>
                 <div className="col-span-2 ">
                   <label
                     htmlFor="hari"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    className="block mb-2 text-sm font-medium text-gray-900 text-black"
                   >
-                    hari
+                    Hari
                   </label>
                   <input
                     type="text"
                     id="hari"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black "
                     value={hari}
                     readOnly
                   />
                 </div>
                 <div className="col-span-2 mb-2">
-                  <FileInput
-                    id="foto_profil"
-                    type="file"
-                    accept="image/*"
-                    Label="Bukti"
-                    onChange={(e) => setBukti(e.target.files[0])}
-                  />
+                  <FileInput onChange={handleFileChange} />
                 </div>
               </div>
               <div className="flex justify-between">
                 <button
                   type="submit"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                  className="inline-block px-4 py-2 mb-4  font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-blue-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85 "
                 >
                   Submit Pelaporan
                 </button>
                 <ButtonReset
-                  className="focus:outline-none text-white bg-red-400 hover:bg-red-400 focus:ring-2 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                  className="inline-block px-5 py-2 mb-4 ml-auto font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-red-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
                   onReset={handleReset}
                 ></ButtonReset>
               </div>
+              {successMessage && (
+                <p className="text-green-500">{successMessage}</p>
+              )}
             </form>
           </div>
         </div>
