@@ -12,7 +12,7 @@ import { AddDataPetugas } from "../../../../config/User/Pelaporan/PetugasLIar/Pe
 
 export const ModalPetugasLiar = ({ isOpen, onClose }) => {
   const [hari, setHari] = useState("");
-  const [waktu, setWaktu] = useState("");
+  const [tanggaldanwaktu, setWaktu] = useState("");
   const [bukti, setBukti] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [latitude, setLatitude] = useState("");
@@ -69,7 +69,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
         latitude,
         longitude,
         identitas_petugas,
-        waktu,
+        tanggaldanwaktu,
         hari,
         bukti,
       });
@@ -225,7 +225,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose }) => {
                     type="text"
                     id="waktu"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
-                    value={waktu}
+                    value={tanggaldanwaktu}
                     readOnly
                   />
                 </div>

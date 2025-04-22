@@ -33,9 +33,7 @@ export const AdminTableParkrLiar = ({ items, onModalToggle, onDelete }) => {
             <th scope="col" className="px-6 py-3">
               Deskripsi Masalah
             </th>
-            <th scope="col" className="px-6 py-3">
-              Prediction
-            </th>
+
             <th scope="col" className="px-6 py-3">
               Action
             </th>
@@ -55,7 +53,6 @@ export const AdminTableParkrLiar = ({ items, onModalToggle, onDelete }) => {
               <td className="px-6 py-4">{item.longitude}</td>
               <td className="px-6 py-4">{item.lokasi}</td>
               <td className="px-6 py-4">{item.deskripsi_masalah}</td>
-              <td className="px-6 py-4">{item.status}</td>
               <td className="px-6 py-4 flex items-center space-x-4">
                 <button
                   onClick={() => onDelete(item.id)}

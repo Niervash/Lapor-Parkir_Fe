@@ -119,6 +119,7 @@ export const AdminDetailPetugasLiarSection = () => {
 
       <div className="w-full mt-4 pb-4 mx-auto">
         <AdminDetailBoxPetugas
+          id_pl={item.id || "N/A"}
           identitas_petugas={item.identitas_petugas || "N/A"}
           tanggaldanwaktu={item.tanggaldanwaktu || "N/A"}
           latitude={latitude || "N/A"}

@@ -19,8 +19,8 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
   const fetchData = async () => {
     try {
       const response = await GetDataParkir();
-      console.log("awsd", data);
-      setData(response);
+      console.log("awsd", response.data);
+      setData(response.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       setToastMessage("Failed to fetch data");

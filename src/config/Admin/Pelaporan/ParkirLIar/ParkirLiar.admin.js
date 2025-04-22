@@ -66,6 +66,8 @@ const UpdateLaporanParkir = async (id) => {
   }
 };
 
+const ApproveParkir = async () => {};
+const RejectParkir = async () => {};
 export {
   GetDataParkir,
   DeleteLaporanParkir,

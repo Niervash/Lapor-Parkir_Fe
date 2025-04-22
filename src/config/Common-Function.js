@@ -50,7 +50,7 @@ const Waktuset = (setWaktu) => {
   const seconds = String(now.getSeconds()).padStart(2, "0");
 
   // Format timestamp yang benar untuk PostgreSQL
-  const formattedDateTime = `${hours}:${minutes}:${seconds}`;
+  const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
   setWaktu(formattedDateTime); // Contoh output: "2023-11-15 03:50:00"
 };

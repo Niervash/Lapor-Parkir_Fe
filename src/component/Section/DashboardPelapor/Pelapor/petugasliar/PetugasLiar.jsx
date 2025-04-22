@@ -28,6 +28,7 @@ export const PetugasLiar = () => {
     const { Id_Pengguna } = await GetItem();
     try {
       const response = await GetDataPetugas(Id_Pengguna);
+      console.log(response.data.rows);
       setData(response.data.rows);
       setLoading(false);
     } catch (error) {

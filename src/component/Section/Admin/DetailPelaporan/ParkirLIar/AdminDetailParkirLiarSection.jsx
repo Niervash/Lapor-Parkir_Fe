@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
+import { Marker, Popup } from "react-leaflet";
 import { AdminDetailBoxParkir } from "../../../../Fragment/Admin/DetailTable/DetailBox/AdminDetailboxParkir/AdminDetailBoxParkir";
 import logo from "../../../../../../public/assets/img/carousel-1.jpg";
 import { useParams } from "react-router-dom";
 import { AdminGetDetailParkir } from "../../../../../config/Admin/Pelaporan/ParkirLIar/ParkirLiar.admin";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const MapWithCenter = ({ latitude, longitude }) => {
   const map = useMap();
   useEffect(() => {
@@ -26,6 +30,7 @@ export const AdminDetailParkirLiarSection = () => {
     const getData = async () => {
       try {
         const response = await AdminGetDetailParkir(id);
+        console.log("asdad", item);
         setItem(response.data || {});
         toast.success("Fetching berhasil!");
       } catch (err) {

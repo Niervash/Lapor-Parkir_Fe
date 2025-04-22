@@ -53,4 +53,46 @@ const DeleteLaporanPetugas = async (id) => {
     throw error;
   }
 };
-export { GetDataPetugas, DeleteLaporanPetugas, GetDetailPetugas };
+
+const processPetugasAction = async (id, action) => {
+  const { Tokens } = await GetItem();
+
+  if (!["Approve", "Reject"].includes(action)) {
+    throw new Error('Action harus berupa "Approve" atau "Reject"');
+  }
+
+  try {
+    const response = await cookieApiClient.post(
+      `/admin-petugas/${id}`,
+      { action }, // Mengirim action dalam body request
+      {
+        headers: {
+          Authorization: `Bearer ${Tokens}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error ${action.toLowerCase()}ing petugas:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+const ApprovePetugas = async (id) => {
+  return processPetugasAction(id, "Approve");
+};
+
+const RejectPetugas = async (id) => {
+  return processPetugasAction(id, "Reject");
+};
+export {
+  GetDataPetugas,
+  DeleteLaporanPetugas,
+  GetDetailPetugas,
+  ApprovePetugas,
+  RejectPetugas,
+};
