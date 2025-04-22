@@ -105,7 +105,7 @@ export const BioProfilView = ({
 
             <hr className="h-px mx-0 my-4 bg-transparent border-0 opacity-25 bg-gradient-to-r from-transparent via-black/40 to-transparent" />
 
-            <div className="flex flex-wrap -mx-3">
+            {/* <div className="flex flex-wrap -mx-3">
               <div className="w-full max-w-full px-4 shrink-0 md:w-full md:flex-0">
                 <div className="flex space-x-4">
                   <button
@@ -123,7 +123,7 @@ export const BioProfilView = ({
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

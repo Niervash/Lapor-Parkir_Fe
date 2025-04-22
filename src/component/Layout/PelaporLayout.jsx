@@ -179,7 +179,19 @@ const PelaporLayout = ({
           {/* Start Breadcrumb */}
           <div className="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
             <nav>
-              <ol className="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
+              <ol className="flex items-center flex-wrap pt-1 bg-transparent rounded-lg">
+                {/* Hamburger Menu - Hanya tampil di mobile */}
+                <li className="flex items-center xl:hidden">
+                  <button
+                    onClick={toggleSidebar}
+                    className="block p-2 text-sm text-white transition-all ease-nav-brand"
+                  >
+                    <div className="w-4.5 overflow-hidden">
+                      <RxHamburgerMenu />
+                    </div>
+                  </button>
+                </li>
+
                 <li className="text-white opacity-50">Pages</li>
                 <li
                   className="text-sm pl-2 capitalize leading-normal text-white before:float-left before:pr-2 before:text-white before:content-['/']"
@@ -202,16 +214,6 @@ const PelaporLayout = ({
                       alt="User"
                       className="w-10 h-10 rounded-full shadow-lg object-cover transition-opacity duration-300 ease-in-out hover:opacity-75"
                     />
-                  </button>
-                </li>
-                <li className="flex items-center pl-4 xl:hidden">
-                  <button
-                    onClick={toggleSidebar}
-                    className="block p-0 text-sm text-white transition-all ease-nav-brand"
-                  >
-                    <div className="w-4.5 overflow-hidden">
-                      <RxHamburgerMenu />
-                    </div>
                   </button>
                 </li>
               </ul>

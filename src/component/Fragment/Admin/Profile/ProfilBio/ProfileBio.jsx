@@ -93,7 +93,7 @@ export const ProfileBio = ({ nama, email, jenis_kelamin, username, role }) => {
               </div>
             </div>
 
-            <div class="flex flex-wrap -mx-3">
+            {/* <div class="flex flex-wrap -mx-3">
               <div class="w-full max-w-full px-4 shrink-0 md:w-full md:flex-0">
                 <div class="flex space-x-4">
                   <button
@@ -110,7 +110,7 @@ export const ProfileBio = ({ nama, email, jenis_kelamin, username, role }) => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

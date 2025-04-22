@@ -70,11 +70,11 @@ export const AdminHome = () => {
           <StatsCardDashboard />
         </div>
         <div className="ml-2 mt-6">
-          <p className="leading-normal font-bold uppercase text-sm mb-6">
+          {/* <p className="leading-normal font-bold uppercase text-sm mb-6">
             OVERVIEW
-          </p>
+          </p> */}
           {/* Card Content */}
-          <AdminOverviewCard />
+          {/* <AdminOverviewCard /> */}
         </div>
       </div>
     </div>

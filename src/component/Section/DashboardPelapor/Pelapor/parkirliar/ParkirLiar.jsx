@@ -69,15 +69,6 @@ export const ParkirLiar = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center p-4">
-        <p className="text-gray-600 text-lg mb-2">No results found</p>
-        <p className="text-gray-500 text-sm">Try again.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full px-6 py-6 mx-auto">
       <StatsCardDashboard />
@@ -102,7 +93,9 @@ export const ParkirLiar = () => {
           </>
         ) : (
           <div className="flex flex-col items-center justify-center p-4">
-            <p className="text-gray-600 text-lg mb-2 ">No data available</p>
+            <p className="text-gray-600 text-lg mb-2 mt-20">
+              No data available
+            </p>
             <p className="text-gray-500 text-sm">Please add new data.</p>
           </div>
         )}

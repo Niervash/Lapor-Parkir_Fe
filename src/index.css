@@ -4,3 +4,31 @@
 .html {
   scroll-behavior: smooth;
 }
+/* Style untuk marker */
+.custom-marker-icon {
+  background: none;
+  border: none;
+}
+
+/* Style untuk popup */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+}
+
+.leaflet-popup-content {
+  margin: 8px 12px;
+  font-size: 14px;
+}
+
+/* Style untuk tombol locate */
+.leaflet-control-locate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.leaflet-control-locate:hover {
+  background-color: #f5f5f5;
+  transform: scale(1.05);
+}

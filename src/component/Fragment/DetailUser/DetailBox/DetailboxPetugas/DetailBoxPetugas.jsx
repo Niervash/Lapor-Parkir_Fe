@@ -169,7 +169,7 @@ export const DetailBoxPetugas = ({
               <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0"></div>
             </div>
 
-            <div class="flex flex-wrap -mx-3">
+            {/* <div class="flex flex-wrap -mx-3">
               <div class="w-full max-w-full px-4 shrink-0 md:w-full md:flex-0">
                 <div class="flex space-x-4">
                   <button
@@ -186,7 +186,7 @@ export const DetailBoxPetugas = ({
                   </button>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

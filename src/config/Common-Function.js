@@ -42,16 +42,17 @@ const resetHandleParkir = (setters) => {
 const Waktuset = (setWaktu) => {
   const now = new Date();
 
-  // Format tanggal dan waktu sesuai kebutuhan
-  const day = String(now.getDate()).padStart(2, "0"); // Hari (DD)
-  const month = String(now.getMonth() + 1).padStart(2, "0"); // Bulan (MM)
-  const year = now.getFullYear(); // Tahun (YYYY)
-  const hours = String(now.getHours()).padStart(2, "0"); // Jam (HH)
-  const minutes = String(now.getMinutes()).padStart(2, "0"); // Menit (MM)
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = now.getFullYear();
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
 
-  // Gabungkan dalam format yang diinginkan
-  const formattedDateTime = `${day}/${month}/${year}, ${hours}:${minutes}`;
-  setWaktu(formattedDateTime);
+  // Format timestamp yang benar untuk PostgreSQL
+  const formattedDateTime = `${hours}:${minutes}:${seconds}`;
+
+  setWaktu(formattedDateTime); // Contoh output: "2023-11-15 03:50:00"
 };
 
 const Hariset = (setHari) => {

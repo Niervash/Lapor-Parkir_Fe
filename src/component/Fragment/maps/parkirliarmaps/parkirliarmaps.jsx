@@ -1,60 +1,132 @@
-import React, { useState, useEffect } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMapEvents,
-  useMap,
-} from "react-leaflet";
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-const LocationMarker = ({ onLocationClick }) => {
-  const [position, setPosition] = useState(null);
-  const map = useMap();
-
-  useMapEvents({
-    click(e) {
-      const { lat, lng } = e.latlng;
-      setPosition([lat, lng]);
-      onLocationClick(lat, lng);
-    },
+// Buat custom icon marker
+const createMarkerIcon = () => {
+  return L.divIcon({
+    className: "custom-marker-icon",
+    html: `
+      <div style="
+        position: relative;
+        width: 30px;
+        height: 30px;
+        background: #34a853;
+        border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        border: 2px solid white;
+      ">
+        <div style="
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          background: white;
+          border-radius: 50%;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(45deg);
+        "></div>
+      </div>
+    `,
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
   });
+};
+
+const LocationMarker = ({ onLocationClick }) => {
+  const map = useMap();
+  const [position, setPosition] = React.useState(null);
+
+  const handleLocationFound = (e) => {
+    const { lat, lng } = e.latlng;
+    setPosition(e.latlng);
+    onLocationClick(lat, lng);
+    map.flyTo(e.latlng, 16);
+  };
 
   const locateUser = () => {
-    map.locate().on("locationfound", function (e) {
-      setPosition([e.latlng.lat, e.latlng.lng]);
-      onLocationClick(e.latlng.lat, e.latlng.lng);
-      map.flyTo([e.latlng.lat, e.latlng.lng], map.getZoom());
+    map.locate({
+      setView: true,
+      maxZoom: 16,
+      timeout: 10000,
+      enableHighAccuracy: true,
     });
   };
 
-  // Automatically locate user when component is mounted
-  useEffect(() => {
-    locateUser();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  React.useEffect(() => {
+    map.on("click", (e) => {
+      const { lat, lng } = e.latlng;
+      setPosition(e.latlng);
+      onLocationClick(lat, lng);
+    });
 
-  return position === null ? null : (
+    map.on("locationfound", handleLocationFound);
+    map.on("locationerror", (e) => {
+      alert("Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin diberikan.");
+      console.error(e.message);
+    });
+
+    return () => {
+      map.off("click");
+      map.off("locationfound", handleLocationFound);
+      map.off("locationerror");
+    };
+  }, [map, onLocationClick]);
+
+  return (
     <>
-      <Marker position={position}></Marker>
       <button
-        className="bg-blue-200"
         onClick={locateUser}
-        onTouchStart={locateUser}
+        className="leaflet-control-locate"
         style={{
           position: "absolute",
           top: "10px",
           right: "10px",
           zIndex: 1000,
-          padding: "10px",
           backgroundColor: "white",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
+          padding: "8px",
+          borderRadius: "4px",
           cursor: "pointer",
+          boxShadow: "0 1px 5px rgba(0,0,0,0.4)",
+          border: "none",
         }}
+        title="Lokasi Saya"
       >
-        GPS
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="#34a853"
+          viewBox="0 0 16 16"
+        >
+          <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+        </svg>
       </button>
+      {position && (
+        <Marker
+          position={position}
+          icon={createMarkerIcon()}
+          eventHandlers={{
+            dragend: (e) => {
+              const { lat, lng } = e.target.getLatLng();
+              setPosition(e.target.getLatLng());
+              onLocationClick(lat, lng);
+            },
+          }}
+          draggable={true}
+        >
+          <Popup>
+            <div>
+              <strong>Lokasi Parkir Liar</strong>
+              <br />
+              Lat: {position.lat.toFixed(6)}
+              <br />
+              Lng: {position.lng.toFixed(6)}
+            </div>
+          </Popup>
+        </Marker>
+      )}
     </>
   );
 };
@@ -66,6 +138,7 @@ const ParkirLiarmaps = ({ onLocationClick }) => {
         center={[-6.2, 106.816666]}
         zoom={13}
         style={{ height: "100%", width: "100%" }}
+        scrollWheelZoom={true}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

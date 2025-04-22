@@ -7,27 +7,8 @@ import {
   Waktuset,
 } from "../../../../config/Common-Function";
 import { AddDataParkir } from "../../../../config/User/Pelaporan/ParkirLIar/ParkirLIar";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMapEvents,
-  Popup,
-} from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
-// Icon untuk marker lokasi pengguna
-const userIcon = new L.Icon({
-  iconUrl:
-    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
+import ParkirLiarmaps from "../../maps/parkirliarmaps/parkirliarmaps";
+import { toast } from "sonner";
 
 export const ModalParkirLiar = ({ isOpen, onClose }) => {
   const [tanggaldanwaktu, setWaktu] = useState("");
@@ -39,7 +20,6 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
   const [deskripsi_masalah, setDeskripsiMasalah] = useState("");
   const [jenis_kendaraan, setJenisKendaraan] = useState("");
   const [lokasi, setLokasi] = useState("");
-  const [userLocation, setUserLocation] = useState(null); // State untuk lokasi pengguna
 
   useEffect(() => {
     Hariset(setHari);
@@ -56,7 +36,6 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
       setBukti,
       setSuccessMessage,
     });
-    setUserLocation(null); // Reset lokasi pengguna
   };
 
   const handleLocationClick = (lat, lng) => {
@@ -78,7 +57,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
     e.preventDefault();
 
     if (!bukti) {
-      alert("Harap unggah bukti terlebih dahulu!");
+      toast.error("Harap unggah bukti terlebih dahulu!");
       return;
     }
     if (
@@ -90,7 +69,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
       !tanggaldanwaktu ||
       !hari
     ) {
-      alert("Harap isi semua field yang diperlukan!");
+      toast.error("Harap isi semua field yang diperlukan!");
       return;
     }
     try {
@@ -105,28 +84,15 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
         hari,
       });
       setSuccessMessage("Pelaporan berhasil!");
+      toast.success("Pelaporan parkir liar berhasil dikirim!");
+      setTimeout(() => {
+        onClose();
+        handleReset();
+      }, 1500);
     } catch (error) {
+      console.error("Error:", error);
       setSuccessMessage("Gagal menambahkan pelaporan.");
-    }
-  };
-
-  // Fungsi untuk mendapatkan lokasi pengguna
-  const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserLocation([latitude, longitude]);
-          setLatitude(latitude);
-          setLongitude(longitude);
-        },
-        (error) => {
-          console.error("Error getting user location:", error);
-          alert("Gagal mendapatkan lokasi. Pastikan GPS aktif.");
-        }
-      );
-    } else {
-      alert("Browser tidak mendukung geolocation.");
+      toast.error("Gagal mengirim pelaporan parkir liar!");
     }
   };
 
@@ -153,10 +119,12 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
         >
           <div className="relative bg-white rounded-lg shadow">
             <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
-              <h3 className="text-lg font-bold text-gray-600">Tambah Data</h3>
+              <h3 className="text-lg font-bold text-gray-600">
+                Laporkan Parkir Liar
+              </h3>
               <button
                 type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-300 hover:text-gray-900 rounded-full border border-2 text-sm w-8 h-8 ms-auto inline-flex justify-center items-center "
+                className="text-gray-400 bg-transparent hover:bg-gray-300 hover:text-gray-900 rounded-full border border-2 text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
                 onClick={onClose}
               >
                 <svg
@@ -179,29 +147,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
             </div>
             <div className="flex justify-center items-center h-[50vh] p-5 z-40">
               <div className="w-full h-full rounded-lg overflow-hidden shadow-lg border">
-                <div className=" w-full h-full md:h-full  md:w-full">
-                  {" "}
-                  <MapContainer
-                    center={[-6.2, 106.816666]}
-                    zoom={13}
-                    className="h-full w-full"
-                    whenCreated={(map) =>
-                      setTimeout(() => map.invalidateSize(), 99999)
-                    }
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    />
-                    {userLocation && (
-                      <Marker position={userLocation} icon={userIcon}>
-                        <Popup>Lokasi Anda</Popup>
-                      </Marker>
-                    )}
-
-                    <MapClickHandler onLocationClick={handleLocationClick} />
-                  </MapContainer>
-                </div>
+                <ParkirLiarmaps onLocationClick={handleLocationClick} />
               </div>
             </div>
 
@@ -362,13 +308,6 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
               </div>
               <div className="flex justify-between">
                 <button
-                  type="button"
-                  className="inline-block px-4 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-green-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
-                  onClick={getLocation}
-                >
-                  Dapatkan Lokasi Saya
-                </button>
-                <button
                   type="submit"
                   className="inline-block px-4 py-2 mb-4 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-blue-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
                 >
@@ -380,7 +319,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                 />
               </div>
               {successMessage && (
-                <p className="text-green-500">{successMessage}</p>
+                <p className="text-green-500 text-center">{successMessage}</p>
               )}
             </form>
           </div>
@@ -388,15 +327,4 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
-};
-
-// Komponen untuk menangani klik pada peta
-const MapClickHandler = ({ onLocationClick }) => {
-  useMapEvents({
-    click: (e) => {
-      const { lat, lng } = e.latlng;
-      onLocationClick(lat, lng);
-    },
-  });
-  return null;
 };
