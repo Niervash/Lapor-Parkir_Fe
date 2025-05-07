@@ -195,6 +195,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                       Jl. Sisingamangaraja
                     </option>
                     <option value="Kantor wali kota">Kantor wali kota</option>
+                    <option value="Kantor wali kota">Other</option>
                   </select>
                 </div>
                 <div className="col-span-2 sm:col-span-1">

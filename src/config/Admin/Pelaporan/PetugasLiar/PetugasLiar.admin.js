@@ -63,7 +63,7 @@ const processPetugasAction = async (id, action) => {
 
   try {
     const response = await cookieApiClient.post(
-      `/admin-petugas/${id}`,
+      `/adminpetugas/${id}`,
       { action }, // Mengirim action dalam body request
       {
         headers: {

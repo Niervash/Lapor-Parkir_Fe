@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const token = sessionStorage.getItem("Tokens");
   const userRole = sessionStorage.getItem("role");
 
-  const isAuthenticated = token;
+  const isAuthenticated = token;                    
 
   if (!isAuthenticated) {
     return <Navigate to={"/login"} />;
