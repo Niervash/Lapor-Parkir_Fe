@@ -22,6 +22,7 @@ export const PetugasLiar = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshData, setRefreshData] = useState(false);
   const itemsPerPage = 10;
 
   const fetchData = async () => {
@@ -40,10 +41,12 @@ export const PetugasLiar = () => {
   const handleCloseToast = () => {
     setShowToast(false);
   };
-
+  const handleSuccess = () => {
+    setRefreshData((prev) => !prev); // Toggle to trigger refresh
+  };
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [refreshData]);
 
   const totalPages = Math.ceil(
     (data && Array.isArray(data) ? data.length : 0) / itemsPerPage
@@ -119,6 +122,7 @@ export const PetugasLiar = () => {
         <ModalPetugasLiar
           isOpen={ispetugasLiarModalOpen}
           onClose={handleModalpetugas}
+          onSuccess={handleSuccess}
         />
       </div>
     </div>

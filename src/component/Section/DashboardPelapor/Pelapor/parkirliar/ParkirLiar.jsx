@@ -21,6 +21,7 @@ export const ParkirLiar = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [refreshKey, setRefreshKey] = useState(0); // State untuk trigger refresh
   const itemsPerPage = 10;
 
   const fetchData = async () => {
@@ -36,14 +37,16 @@ export const ParkirLiar = () => {
       setLoading(false);
     }
   };
-
+  const handleSuccessSubmit = () => {
+    setRefreshKey((prev) => prev + 1); // Trigger refresh
+  };
   const handleCloseToast = () => {
     setShowToast(false);
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [refreshKey]);
 
   const totalPages = Math.ceil(
     (data && Array.isArray(data) ? data.length : 0) / itemsPerPage
@@ -109,6 +112,7 @@ export const ParkirLiar = () => {
         <ModalParkirLiar
           isOpen={isparkirLiarModalOpen}
           onClose={handleModalParkir}
+          onSuccess={handleSuccessSubmit} // Kirim callback
         />
       </div>
     </div>
