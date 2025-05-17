@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BiSolidDetail } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { formattedDateSet } from "../../../../config/Common-Function";
 
 export const Petugaspetugasliar = ({ items, onModalToggle }) => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export const Petugaspetugasliar = ({ items, onModalToggle }) => {
               className="odd:bg-white odd:bg-gray-900 even:bg-gray-50 border-b "
             >
               <td className="px-6 py-4">
-                {new Date(item.tanggaldanwaktu).toLocaleString()}
+                {formattedDateSet(item.tanggaldanwaktu)}
               </td>
               <td className="px-6 py-4">{item.hari}</td>
               <td className="px-6 py-4">{item.latitude}</td>

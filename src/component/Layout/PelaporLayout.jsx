@@ -119,7 +119,7 @@ const PelaporLayout = ({
                   <i className="relative top-0 text-sm leading-normal text-orange-500 ni ni-calendar-grid-58"></i>
                 </div>
                 <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
-                  PL Table's
+                  Laporan Parkir Liar
                 </span>
               </Link>
             </li>
@@ -132,7 +132,7 @@ const PelaporLayout = ({
                   <i className="relative top-0 text-sm leading-normal text-emerald-500 ni ni-calendar-grid-58"></i>
                 </div>
                 <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
-                  PTL Table's
+                  Laporan Petugas Liar
                 </span>
               </Link>
             </li>
@@ -150,7 +150,7 @@ const PelaporLayout = ({
                   <i className="relative top-0 text-sm leading-normal text-slate-700 ni ni-single-02"></i>
                 </div>
                 <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
-                  Profile
+                  My Profile
                 </span>
               </Link>
             </li>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { GetAllData } from "../../../../config/LandingPage/Xinput";
+import { motion } from "framer-motion";
 import L from "leaflet";
 
 const redIcon = new L.Icon({
@@ -26,11 +27,51 @@ const yellowIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+const AnimatedMap = ({ position }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (position) {
+      map.flyTo(position, 13, { duration: 1.5 });
+    }
+  }, [position, map]);
+
+  return null;
+};
+
 export const AboutSection = () => {
   const [parkiritem, setParkirItem] = useState([]);
   const [petugasitem, setPetugasItem] = useState([]);
+  const [userLocation, setUserLocation] = useState({
+    lat: -6.2088,
+    lng: 106.8456,
+  });
+
+  const [locationError, setLocationError] = useState(null);
 
   useEffect(() => {
+    // Mendapatkan lokasi pengguna
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          setLocationError(error.message);
+          console.error("Error getting location:", error);
+          // Tetap gunakan default location jika gagal
+        }
+      );
+    } else {
+      setLocationError("Geolocation is not supported by this browser.");
+      console.error("Geolocation is not supported by this browser.");
+      // Tetap gunakan default location jika tidak support
+    }
+
+    // Fetch data parkir dan petugas
     const fetchData = async () => {
       try {
         const response = await GetAllData();
@@ -57,34 +98,41 @@ export const AboutSection = () => {
       <div className="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
         <div className="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
           {/* Tmpt Maps */}
-          <MapContainer
-            center={[-6.2088, 106.8456]} // Center map on Jakarta
-            zoom={13}
-            className="h-96 rounded-2xl shadow-md mt-16 md:mt-0 z-0"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
           >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {validParkirItems.map((item, index) => (
-              <Marker
-                key={index}
-                position={[item.latitude, item.longitude]}
-                icon={redIcon}
-              >
-                <Popup>Lokasi Pelanggaran Parkir Liar</Popup>
+            <MapContainer
+              center={[userLocation.lat, userLocation.lng]}
+              zoom={13}
+              className="h-96 rounded-2xl shadow-md mt-16 md:mt-0 z-0"
+            >
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <AnimatedMap position={[userLocation.lat, userLocation.lng]} />
+              <Marker position={[userLocation.lat, userLocation.lng]}>
+                <Popup>Lokasi Anda Saat Ini</Popup>
               </Marker>
-            ))}
-            {validPetugasItems.map((item, index) => (
-              <Marker
-                key={index}
-                position={[item.latitude, item.longitude]}
-                icon={yellowIcon}
-              >
-                <Popup>Lokasi Petugas</Popup>
-              </Marker>
-            ))}
-          </MapContainer>
+              {parkiritem.map((item, index) => (
+                <Marker
+                  key={index}
+                  position={[item.latitude, item.longitude]}
+                  icon={redIcon}
+                >
+                  <Popup>Lokasi Pelanggaran Parkir Liar</Popup>
+                </Marker>
+              ))}
+              {petugasitem.map((item, index) => (
+                <Marker
+                  key={index}
+                  position={[item.latitude, item.longitude]}
+                  icon={yellowIcon}
+                >
+                  <Popup>Lokasi Petugas</Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </motion.div>
           <div className="text-gray-500 sm:text-lg mt-5">
             <h2 className="mb-4 text-3xl font-extrabold tracking-tight text-gray-900">
               Kami menangani parkir liar untuk lingkungan yang lebih baik.

@@ -80,10 +80,17 @@ const PaginationPages = (data, currentPage, itemsPerPage) => {
   };
 };
 
+const formattedDateSet = (dateString) => {
+  if (!dateString) return "";
+
+  return new Date(dateString).toISOString().replace("T", " ").slice(0, 19);
+};
+
 export {
   resetHandlePetugas,
   PaginationPages,
   Waktuset,
   Hariset,
   resetHandleParkir,
+  formattedDateSet,
 };

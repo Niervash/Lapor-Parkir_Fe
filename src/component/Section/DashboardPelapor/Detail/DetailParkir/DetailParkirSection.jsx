@@ -128,6 +128,7 @@ export const DetailParkirSection = () => {
           latitude={latitude || "N/A"}
           longitude={longitude || "N/A"}
           lokasi={item.lokasi || "N/A"}
+          nopol={item.nopol || "N/A"}
           status_post={item.status_post || "N/A"}
           status={item.status || "N/A"}
           deskripsi_masalah={item.deskripsi_masalah || "Tidak ada deskripsi"}

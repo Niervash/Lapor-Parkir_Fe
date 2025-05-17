@@ -3,7 +3,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import default_pict from "../../../Assets/profil.jpg";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { IsRegister } from "../../../../config/Auth/Auth";
 
 export const SignUpSection = () => {
@@ -76,7 +76,11 @@ export const SignUpSection = () => {
                 <div className="flex flex-wrap justify-center -mx-3">
                   <div className="w-full max-w-full px-3 mx-auto mt-0 text-center lg:flex-0 shrink-0 lg:w-5/12">
                     <h1 className="mt-12 mb-2 text-white text-5xl font-bold">
-                      Welcome!
+                      <Link to="/">
+                        <h1 className="ml-2 self-center text-white text-3xl font-semibold whitespace-nowrap">
+                          Lapor <span className="text-sky-300">Parkir</span>
+                        </h1>{" "}
+                      </Link>
                     </h1>
                   </div>
                 </div>

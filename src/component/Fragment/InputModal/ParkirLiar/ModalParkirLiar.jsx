@@ -20,6 +20,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
   const [deskripsi_masalah, setDeskripsiMasalah] = useState("");
   const [jenis_kendaraan, setJenisKendaraan] = useState("");
   const [lokasi, setLokasi] = useState("");
+  const [nopol, setNopol] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
@@ -35,6 +36,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
       setDeskripsiMasalah,
       setJenisKendaraan,
       setLokasi,
+      setNopol,
       setBukti,
       setSuccessMessage,
     });
@@ -67,6 +69,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
       !longitude ||
       !deskripsi_masalah ||
       !lokasi ||
+      !nopol ||
       !jenis_kendaraan ||
       !tanggaldanwaktu ||
       !hari
@@ -83,6 +86,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
         longitude,
         deskripsi_masalah,
         lokasi,
+        nopol,
         bukti,
         jenis_kendaraan,
         tanggaldanwaktu,
@@ -275,6 +279,23 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                       <option value="Other">Other</option>
                     </select>
                   </div>
+                  <div className="col-span-2 ">
+                    <label
+                      htmlFor="hari"
+                      className="block mb-2 text-sm font-medium text-gray-900 text-black"
+                    >
+                      No Polisi
+                    </label>
+                    <input
+                      id="nopol"
+                      placeholder="Masukkan Nopol Kendaraan"
+                      type="text"
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      value={nopol}
+                      onChange={(e) => setNopol(e.target.value)}
+                      required
+                    />
+                  </div>
                   <div className="col-span-2 sm:col-span-1">
                     <label
                       htmlFor="latitude"
@@ -381,6 +402,7 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
                       readOnly
                     />
                   </div>
+
                   <div className="col-span-2 mb-2">
                     <FileInput
                       onChange={handleFileChange}

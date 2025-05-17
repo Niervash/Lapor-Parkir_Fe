@@ -25,4 +25,5 @@ export const cookieApiClientPost = axios.create({
     "Content-Type": "application/json",
   },
 });
+
 export default cookieApiClient;

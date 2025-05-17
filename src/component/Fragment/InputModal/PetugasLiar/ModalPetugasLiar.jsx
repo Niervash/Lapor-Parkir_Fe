@@ -10,7 +10,8 @@ import {
 import { toast } from "sonner";
 import { AddDataPetugas } from "../../../../config/User/Pelaporan/PetugasLIar/PetugasLiar";
 
-export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {  // Added onSuccess prop
+export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {
+  // Added onSuccess prop
   const [hari, setHari] = useState("");
   const [tanggaldanwaktu, setWaktu] = useState("");
   const [bukti, setBukti] = useState(null);
@@ -19,6 +20,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {  // Added 
   const [longitude, setLongitude] = useState("");
   const [identitas_petugas, setIdentitaspetugas] = useState("");
   const [lokasi, setLokasi] = useState("");
+  const [nama, setNama] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
@@ -33,6 +35,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {  // Added 
       setLongitude,
       setIdentitaspetugas,
       setLokasi,
+      setNama,
       setBukti,
       setSuccessMessage,
     });
@@ -69,6 +72,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {  // Added 
 
     try {
       await AddDataPetugas({
+        nama,
         lokasi,
         latitude,
         longitude,
@@ -77,22 +81,21 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {  // Added 
         hari,
         bukti,
       });
-      
+
       setSuccessMessage("Pelaporan berhasil!");
       setIsLoading(false);
       setShowSuccessPopup(true);
-      
+
       // Call the onSuccess callback to trigger refresh in parent component
       if (onSuccess) {
         onSuccess();
       }
-      
+
       setTimeout(() => {
         setShowSuccessPopup(false);
         onClose();
         handleReset();
       }, 3000);
-      
     } catch (error) {
       console.error("Error:", error);
       setSuccessMessage("Gagal menambahkan pelaporan.");
@@ -220,6 +223,23 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {  // Added 
               </div>
               <form className="p-4 md:p-5" onSubmit={submitHandel}>
                 <div className="grid gap-4 mb-4 grid-cols-2">
+                  <div className="col-span-2 ">
+                    <label
+                      htmlFor="hari"
+                      className="block mb-2 text-sm font-medium text-gray-900 text-black"
+                    >
+                      Nama Petugas
+                    </label>
+                    <input
+                      id="nama"
+                      placeholder="Masukkan Nama Petugas"
+                      type="text"
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      value={nama}
+                      onChange={(e) => setNama(e.target.value)}
+                      required
+                    />
+                  </div>
                   <div className="col-span-2 sm:col-span-1">
                     <label
                       htmlFor="lokasi"
@@ -245,6 +265,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {  // Added 
                       <option value="Universitas">Universitas</option>
                     </select>
                   </div>
+
                   <div className="col-span-2 sm:col-span-1">
                     <label
                       htmlFor="identitas_petugas"

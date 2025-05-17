@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BiSolidDetail } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+import { formattedDateSet } from "../../../../config/Common-Function";
 
 export const TableParkirLiar = ({ items, onModalToggle }) => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export const TableParkirLiar = ({ items, onModalToggle }) => {
             >
               <td className="px-6 py-4">{item.jenis_kendaraan}</td>
               <td className="px-6 py-4">
-                {new Date(item.tanggaldanwaktu).toLocaleString()}
+                {formattedDateSet(item.tanggaldanwaktu)}
               </td>
               <td className="px-6 py-4">{item.latitude}</td>
               <td className="px-6 py-4">{item.longitude}</td>

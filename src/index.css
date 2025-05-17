@@ -1,6 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Add in your CSS */
+.pdf-mode {
+  width: 800px !important;
+  max-width: 800px !important;
+  margin: auto !important;
+  zoom: 1 !important;
+  transform: scale(1) !important;
+}
+
 .html {
   scroll-behavior: smooth;
 }

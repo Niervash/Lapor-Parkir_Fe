@@ -63,9 +63,11 @@ export const SignInSection = () => {
                   <div className="relative flex flex-col min-w-0 break-words bg-transparent border-0 lg:py4 rounded-2xl bg-clip-border">
                     <div className="flex items-center justify-center bg-[url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg')] rounded-2xl p-4 mr-5 ml-5 shadow-xl">
                       <img src={logo} alt="Logo" className="w-[60px] h-auto" />
-                      <span className="ml-2 self-center text-white text-2xl font-semibold whitespace-nowrap">
-                        Lapor <span className="text-sky-300">Parkir</span>
-                      </span>
+                      <Link to="/">
+                        <span className="ml-2 self-center text-white text-2xl font-semibold whitespace-nowrap">
+                          Lapor <span className="text-sky-300">Parkir</span>
+                        </span>
+                      </Link>
                     </div>
                     <div className="p-6 pb-0 mb-0">
                       <h4 className="font-bold text-2xl text-gray-500">
