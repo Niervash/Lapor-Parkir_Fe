@@ -16,7 +16,7 @@ import {
   RejectParkir,
 } from "../../../../../config/Admin/Detail/buttonFunction";
 
-// Toast notification component
+/// Toast notification component
 const ToastNotification = ({ message, type, onClose }) => {
   const bgColor = {
     success: "bg-green-500",
