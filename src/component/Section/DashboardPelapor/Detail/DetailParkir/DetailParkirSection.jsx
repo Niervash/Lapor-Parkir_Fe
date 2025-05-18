@@ -26,23 +26,42 @@ export const DetailParkirSection = () => {
   const [item, setItem] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshInterval, setRefreshInterval] = useState(null);
+
+  // Fungsi untuk mengambil data
+  const fetchData = async () => {
+    try {
+      const response = await GetDetailParkir(id);
+      setItem(response.data || {});
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message || "Terjadi kesalahan.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await GetDetailParkir(id);
-        setItem(response.data || {});
-        toast.success("Fetching berhasil!");
-      } catch (err) {
-        setError(err.message);
-        toast.error(err.message || "Terjadi kesalahan.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Ambil data pertama kali
+    fetchData();
 
-    getData();
+    // Setup interval untuk refresh otomatis setiap 30 detik
+    const interval = setInterval(fetchData, 3000);
+    setRefreshInterval(interval);
+
+    // Bersihkan interval saat komponen unmount
+    return () => {
+      if (refreshInterval) clearInterval(refreshInterval);
+    };
   }, [id]);
+
+  // Fungsi untuk manual refresh
+  const handleManualRefresh = () => {
+    setLoading(true);
+    fetchData().then(() => {
+      toast.info("Data diperbarui");
+    });
+  };
 
   if (loading)
     return (
@@ -73,9 +92,32 @@ export const DetailParkirSection = () => {
         draggable
         pauseOnHover
       />
+
+      {/* Tambahkan tombol refresh manual */}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={handleManualRefresh}
+          className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-2"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Refresh Data
+        </button>
+      </div>
+
       <div className="flex flex-wrap mt-6 -mx-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
         {/* Map Section */}
-        <div className="w-full max-w-full px-3 lg:flex-none mt-2">
+        <div className="w-full max-w-full px-3 lg:flex-none mt-2 z-0">
           <div className="flex-auto p-4 rounded-2xl border-0 shadow-2xl bg-white">
             <h1 className="ml-5 mb-3 font-bold text-gray-500">MAPS</h1>
             {latitude !== null && longitude !== null ? (

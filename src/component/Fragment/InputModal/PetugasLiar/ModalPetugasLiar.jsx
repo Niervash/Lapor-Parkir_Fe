@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { AddDataPetugas } from "../../../../config/User/Pelaporan/PetugasLIar/PetugasLiar";
 
 export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {
-  // Added onSuccess prop
+  // State yang sudah ada
   const [hari, setHari] = useState("");
   const [tanggaldanwaktu, setWaktu] = useState("");
   const [bukti, setBukti] = useState(null);
@@ -23,6 +23,10 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {
   const [nama, setNama] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
+  // Tambahkan state untuk error popup
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     Hariset(setHari);
@@ -86,7 +90,6 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {
       setIsLoading(false);
       setShowSuccessPopup(true);
 
-      // Call the onSuccess callback to trigger refresh in parent component
       if (onSuccess) {
         onSuccess();
       }
@@ -98,26 +101,23 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {
       }, 3000);
     } catch (error) {
       console.error("Error:", error);
-      setSuccessMessage("Gagal menambahkan pelaporan.");
+      setErrorMessage("Gagal menambahkan pelaporan. Silakan coba lagi.");
       setIsLoading(false);
-      toast.error("Gagal mengirim pelaporan petugas liar!", {
-        position: "top-center",
-        duration: 3000,
-      });
+      setShowErrorPopup(true); // Tampilkan popup error
     }
   };
 
   return (
     <div>
-      {/* Background blur effect - only shown when main modal is open and no other modals */}
-      {isOpen && !isLoading && !showSuccessPopup && (
+      {/* Background blur effect */}
+      {isOpen && !isLoading && !showSuccessPopup && !showErrorPopup && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-md"
           onClick={onClose}
         ></div>
       )}
 
-      {/* Loading overlay with blur effect */}
+      {/* Loading overlay */}
       {isLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
@@ -177,8 +177,46 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {
         </div>
       )}
 
-      {/* Main modal - only shown when no other modals are active */}
-      {isOpen && !isLoading && !showSuccessPopup && (
+      {/* Error popup */}
+      {showErrorPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full mx-4">
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <svg
+                  className="w-10 h-10 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Gagal!</h3>
+              <p className="text-sm text-gray-600 text-center">
+                {errorMessage}
+              </p>
+              <button
+                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                onClick={() => {
+                  setShowErrorPopup(false);
+                }}
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main modal */}
+      {isOpen && !isLoading && !showSuccessPopup && !showErrorPopup && (
         <div
           className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex"
           onClick={onClose}
@@ -263,6 +301,7 @@ export const ModalPetugasLiar = ({ isOpen, onClose, onSuccess }) => {
                       </option>
                       <option value="Rumah Sakit">Rumah Sakit</option>
                       <option value="Universitas">Universitas</option>
+                      <option value="Other">Other</option>
                     </select>
                   </div>
 

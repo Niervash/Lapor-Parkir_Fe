@@ -1,15 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { formattedDateSet } from "../../../../../../config/Common-Function";
+import { FaRegTrashAlt } from "react-icons/fa";
+import {
+  ApprovePetugas,
+  RejectPetugas,
+} from "../../../../../../config/Admin/Detail/buttonFunction";
 
 export const AdminDetailBoxPetugas = ({
+  id_pl,
   identitas_petugas,
+  nama,
   tanggaldanwaktu,
   latitude,
   longitude,
   lokasi,
+  akurasi,
   status,
   status_post,
   hari,
 }) => {
+  const [statusliar, setStatusLiar] = useState("");
+  const [statusTidakliar, setStatusTidakLiar] = useState("");
+
+  const statusLaporanColors = {
+    approve: "bg-green-700 text-white shadow-xl",
+    reject: "bg-red-500 text-white shadow-xl",
+    pending: "bg-orange-500 text-white shadow-xl",
+  };
+
+  const prediksiLaporan = {
+    liar: "bg-red-700 text-white shadow-xl",
+    "tidak liar": "bg-green-400 text-white shadow-xl",
+  };
+
+  useEffect(() => {
+    setStatusLiar("Liar");
+    setStatusTidakLiar("Tidak Liar");
+  }, []);
+
+  const getStatusColor = (status) => {
+    const lowerStatus = status?.toLowerCase() || "";
+    return statusLaporanColors[lowerStatus] || "bg-gray-100 text-gray-800";
+  };
+
+  const getPrediksiStatusColor = (status) => {
+    const dropStatus = status?.toLowerCase() || "";
+    return prediksiLaporan[dropStatus] || "bg-gray-100 text-gray-800";
+  };
   return (
     <div class="flex flex-wrap -mx-3 ">
       <div class="w-full max-w-full px-3 shrink-0 md:w-12/12 md:flex-0 ">
@@ -23,6 +60,25 @@ export const AdminDetailBoxPetugas = ({
               <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
                 <div class="mb-4">
                   <label
+                    for="nama"
+                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                  >
+                    Nama Petugas
+                  </label>
+                  {nama && (
+                    <input
+                      value={nama.toUpperCase()}
+                      type="text"
+                      name="nama"
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
+                    />
+                  )}
+                </div>
+              </div>
+              <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                <div class="mb-4">
+                  <label
                     for="username"
                     class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
                   >
@@ -33,7 +89,8 @@ export const AdminDetailBoxPetugas = ({
                       value={identitas_petugas}
                       type="text"
                       name="username"
-                      class="focus:shadow-primary-outline  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
                     />
                   )}
                 </div>
@@ -46,12 +103,32 @@ export const AdminDetailBoxPetugas = ({
                   >
                     Tanggal Dan Waktu
                   </label>
-                  {new Date(tanggaldanwaktu).toLocaleString() && (
+                  {formattedDateSet(tanggaldanwaktu) && (
                     <input
                       type="email"
                       name="email"
-                      value={new Date(tanggaldanwaktu).toLocaleString()}
-                      class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                      value={formattedDateSet(tanggaldanwaktu)}
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
+                    />
+                  )}
+                </div>
+              </div>
+              <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
+                <div class="mb-4">
+                  <label
+                    for="city"
+                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                  >
+                    Hari Pelaporan
+                  </label>
+                  {hari && (
+                    <input
+                      type="text"
+                      name="city"
+                      value={hari}
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
                     />
                   )}
                 </div>
@@ -69,7 +146,8 @@ export const AdminDetailBoxPetugas = ({
                       type="text"
                       name="first name"
                       value={latitude}
-                      class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
                     />
                   )}
                 </div>
@@ -87,7 +165,8 @@ export const AdminDetailBoxPetugas = ({
                       type="text"
                       name="last name"
                       value={longitude}
-                      class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
                     />
                   )}
                 </div>
@@ -107,91 +186,63 @@ export const AdminDetailBoxPetugas = ({
                       type="text"
                       name="address"
                       value={lokasi}
-                      class="focus:shadow-primary-outline  text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
                     />
                   )}
                 </div>
               </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
-                <div class="mb-4">
+              <div className="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
+                <div className="mb-4">
                   <label
-                    for="city"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                    htmlFor="status"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700"
                   >
-                    Hari Pelaporan
+                    Akurasi Pelaporan
                   </label>
-                  {hari && (
-                    <input
-                      type="text"
-                      name="city"
-                      value={hari}
-                      class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
-                    />
-                  )}
-                </div>
-              </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
-                <div class="mb-4">
-                  <label
-                    for="city"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                  <div
+                    className={`p-2 rounded-md bg-gray-700 text-white shadow-xl text-center font-medium`}
                   >
-                    Status Pelaporan
-                  </label>
-                  {status_post && (
-                    <input
-                      type="text"
-                      name="city"
-                      value={status_post}
-                      class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
-                    />
-                  )}
+                    {akurasi ? Number(akurasi).toFixed(1) : "-"} %
+                  </div>
                 </div>
               </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
-                <div class="mb-4">
+
+              <div className="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
+                <div className="mb-4">
                   <label
-                    for="country"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                    htmlFor="status"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700"
+                  >
+                    Status Laporan
+                  </label>
+                  <div
+                    className={`p-2 rounded-md ${getStatusColor(
+                      status_post
+                    )} text-center font-medium`}
+                  >
+                    {status_post || "-"}
+                  </div>
+                </div>
+              </div>
+              <div className="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
+                <div className="mb-4">
+                  <label
+                    htmlFor="status"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700"
                   >
                     Status
                   </label>
-                  {status && (
-                    <input
-                      type="text"
-                      name="country"
-                      value={status}
-                      class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-2 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
-                    />
-                  )}
+                  <div
+                    className={`p-2 rounded-md ${getPrediksiStatusColor(
+                      status
+                    )} text-center font-medium`}
+                  >
+                    {status || "-"}
+                  </div>
                 </div>
               </div>
               <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0"></div>
-            </div>
-
-            <div className="flex flex-wrap -mx-3">
-              <div className="w-full max-w-full px-4 shrink-0 md:w-full md:flex-0">
-                <div className="flex flex-col md:flex-row md:justify-end space-y-4 md:space-y-0 md:space-x-4">
-                  <button
-                    type="button"
-                    className="inline-block px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-red-600 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
-                  >
-                    Deleted
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-block px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-red-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
-                  >
-                    Reject
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-block px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-green-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
-                  >
-                    Approve
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>

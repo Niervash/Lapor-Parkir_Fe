@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StatsCardDashboard } from "../../../../Fragment/statistikCard/StatsCardDashboard";
-import { AdminTableParkrLiar } from "../../../../Fragment/Admin/AdminTable/ParkirLIar/AdminTableParkrLiar";
-import {
-  DeleteLaporanParkir,
-  GetDataParkir,
-} from "../../../../../config/Admin/Pelaporan/ParkirLIar/ParkirLiar.admin";
+import { AdminTablePetugasLiar } from "../../../../Fragment/Admin/AdminTable/PetugasLIar/AdminTablePetugasLiar";
 import { Pagination } from "../../../../bases/Dashboard/Pagination/Pagination";
+import { StatsCardDashboard } from "../../../../Fragment/statistikCard/StatsCardDashboard";
+import {
+  DeleteLaporanPetugas,
+  GetDataPetugas,
+} from "../../../../../config/Admin/Pelaporan/PetugasLiar/PetugasLiar.admin";
+import { GetItem } from "../../../../../config/SetItem";
 
-export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
+export const AdminPetugasLiarSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [ispetugasLiarModalOpen, setIsModalPetugasLiarOpen] = useState(false);
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,9 +35,13 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
 
   useEffect(() => {
     window.addEventListener("resize", handleResize);
+
+    // Mulai polling saat komponen mount
     startPolling();
+
     return () => {
       window.removeEventListener("resize", handleResize);
+      // Bersihkan interval saat komponen unmount
       if (pollingInterval.current) {
         clearInterval(pollingInterval.current);
       }
@@ -43,40 +49,33 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
   }, []);
 
   const startPolling = () => {
-    pollingInterval.current = setInterval(fetchData, 10000);
+    // Cek data setiap 10 detik
+    pollingInterval.current = setInterval(fetchData, 2000);
   };
-  const loadingButt = async () => {
-    setIsLoading(true);
-  };
+
   const fetchData = async () => {
     try {
-      const response = await GetDataParkir();
+      const { Id_Pengguna } = await GetItem();
+      const response = await GetDataPetugas();
 
+      // Jika ada data baru
       if (
         !lastUpdateTime.current ||
         new Date(response.lastUpdated) > new Date(lastUpdateTime.current)
       ) {
+        // Update waktu terakhir update
         lastUpdateTime.current = response.lastUpdated;
 
+        // Update state hanya jika benar-benar ada perubahan
         if (JSON.stringify(response.data) !== JSON.stringify(data)) {
           setData(response.data || []);
 
-          if (
-            !isLoading &&
-            !isDeleting &&
-            data.length > 0 &&
-            response.data.length > data.length
-          ) {
-            setPopupMessage("Ada data parkir liar baru!");
-            setShowSuccessPopup(true);
-          }
+          // Tampilkan notifikasi jika ada data baru dan user tidak sedang melakukan operasi lain
         }
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
       if (!isDeleting) {
-        setPopupMessage("Gagal memuat data parkir liar");
-        setShowErrorPopup(true);
       }
     } finally {
       setIsLoading(false);
@@ -91,18 +90,19 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
   const confirmDelete = async () => {
     setIsDeleting(true);
     try {
-      await DeleteLaporanParkir(itemToDelete);
+      await DeleteLaporanPetugas(itemToDelete);
       const newData = data.filter((item) => item.id !== itemToDelete);
       setData(newData);
-      setPopupMessage("Data parkir liar berhasil dihapus!");
+      setPopupMessage("Data petugas liar berhasil dihapus!");
       setShowSuccessPopup(true);
 
+      // Reset ke halaman sebelumnya jika data di halaman kosong
       if (newData.length > 0 && currentItems.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (error) {
       console.error("Error deleting data:", error);
-      setPopupMessage("Gagal menghapus data parkir liar");
+      setPopupMessage("Gagal menghapus data petugas liar");
       setShowErrorPopup(true);
     } finally {
       setIsDeleting(false);
@@ -117,6 +117,7 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
   };
 
   useEffect(() => {
+    // Fetch data pertama kali
     fetchData();
   }, []);
 
@@ -127,10 +128,6 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const handleModalToggle = () => {
-    setIsModalOpen(!isModalOpen);
-  };
 
   return (
     <div className="w-full px-4 sm:px-6 py-4 mx-auto relative min-h-[300px]">
@@ -147,7 +144,7 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
           {isLoading && !isDeleting ? (
             <div className="flex flex-col items-center justify-center py-36">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-              <p className="text-gray-600">Memuat data parkir liar...</p>
+              <p className="text-gray-600">Memuat data petugas liar...</p>
             </div>
           ) : /* Empty State */
           data.length === 0 ? (
@@ -170,11 +167,11 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
                 Tidak ada data
               </h3>
               <p className="text-sm text-gray-500 text-center max-w-md px-4">
-                Belum ada data parkir liar yang tercatat. Data akan muncul di
+                Belum ada data petugas liar yang tercatat. Data akan muncul di
                 sini setelah ada laporan.
               </p>
               <button
-                onClick={loadingButt}
+                onClick={fetchData}
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm"
               >
                 Coba Muat Ulang
@@ -182,10 +179,10 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
             </div>
           ) : (
             <>
-              <AdminTableParkrLiar
+              <AdminTablePetugasLiar
                 items={currentItems}
                 isMobile={isMobile}
-                onModalToggle={handleModalToggle}
+                onModalToggle={() => setIsModalOpen(!isModalOpen)}
                 onDelete={handleDeleteClick}
               />
 
@@ -245,7 +242,7 @@ export const AdminParkirLiarSection = ({ Id_Pengguna }) => {
                   isMobile ? "text-xs" : "text-sm"
                 } text-gray-600 text-center mb-4 sm:mb-6`}
               >
-                Apakah Anda yakin ingin menghapus data parkir liar ini?
+                Apakah Anda yakin ingin menghapus data petugas liar ini?
               </p>
               <div className="flex space-x-3 sm:space-x-4 w-full">
                 <button

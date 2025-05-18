@@ -17,9 +17,10 @@ export const DetailBoxParkir = ({
 }) => {
   const [statusliar, setStatusLiar] = useState("");
   const [statusTidakliar, setStatusTidakLiar] = useState("");
+  const [currentStatusPost, setCurrentStatusPost] = useState(status_post);
 
   const statusLaporanColors = {
-    accept: "bg-green-700 text-white shadow-xl",
+    approve: "bg-green-700 text-white shadow-xl",
     reject: "bg-red-500 text-white shadow-xl",
     pending: "bg-orange-500 text-white shadow-xl",
   };
@@ -33,6 +34,10 @@ export const DetailBoxParkir = ({
     setStatusLiar("Liar");
     setStatusTidakLiar("Tidak Liar");
   }, []);
+
+  useEffect(() => {
+    setCurrentStatusPost(status_post);
+  }, [status_post]);
 
   const getStatusColor = (status) => {
     const lowerStatus = status?.toLowerCase() || "";
@@ -207,10 +212,10 @@ export const DetailBoxParkir = ({
                   </label>
                   <div
                     className={`p-2 rounded-md ${getStatusColor(
-                      status_post
+                      currentStatusPost
                     )} text-center font-medium`}
                   >
-                    {status_post || "-"}
+                    {currentStatusPost || "-"}
                   </div>
                 </div>
               </div>

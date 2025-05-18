@@ -62,7 +62,7 @@ const PelaporLayout = ({
       <aside
         className={`fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 ${
           isSidebarOpen ? "ml-6" : "-translate-x-full"
-        } bg-white border-0 drop-shadow-lg max-w-64 ease-nav-brand z-990 rounded-2xl left-0`}
+        } bg-white border-0 drop-shadow-lg max-w-64 ease-nav-brand z-990 rounded-2xl left-0 z-50`}
         aria-expanded={isSidebarOpen}
       >
         {/* Header title */}

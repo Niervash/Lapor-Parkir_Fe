@@ -62,11 +62,11 @@ export const AdminLayout = ({
   };
 
   return (
-    <div className="m-0 font-sans text-base antialiased font-normal bg-white leading-default bg-gray-50 text-slate-500">
+    <div className="m-0 font-sans text-base antialiased font-normal bg-white leading-default bg-gray-50 text-slate-500 ">
       <aside
         className={`fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 ${
           isSidebarOpen ? "ml-6" : "-translate-x-full"
-        } bg-white border-0 drop-shadow-lg max-w-64 ease-nav-brand z-990 rounded-2xl left-0`}
+        } bg-white border-0 drop-shadow-lg max-w-64 ease-nav-brand z-990 rounded-2xl left-0 z-50`}
         aria-expanded={isSidebarOpen}
       >
         <div className="h-19">
@@ -116,7 +116,7 @@ export const AdminLayout = ({
                   <i className="relative top-0 text-sm leading-normal text-orange-500 ni ni-calendar-grid-58"></i>
                 </div>
                 <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
-                  PL Table's
+                  Laporan Parkir Liar
                 </span>
               </Link>
             </li>
@@ -129,7 +129,7 @@ export const AdminLayout = ({
                   <i className="relative top-0 text-sm leading-normal text-emerald-500 ni ni-calendar-grid-58"></i>
                 </div>
                 <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
-                  PTL Table's
+                  Laporan Petugas Liar
                 </span>
               </Link>
             </li>
@@ -142,7 +142,7 @@ export const AdminLayout = ({
                   <i className="relative top-0 text-sm leading-normal text-slate-700 ni ni-single-02"></i>
                 </div>
                 <span className="text-black ml-1 duration-300 opacity-100 pointer-events-none ease">
-                  Profile
+                  My Profile
                 </span>
               </Link>
             </li>

@@ -9,14 +9,16 @@ export const DetailBoxPetugas = ({
   longitude,
   lokasi,
   status,
+  akurasi,
   status_post,
   hari,
 }) => {
   const [statusliar, setStatusLiar] = useState("");
   const [statusTidakliar, setStatusTidakLiar] = useState("");
+  const [currentStatusPost, setCurrentStatusPost] = useState(status_post);
 
   const statusLaporanColors = {
-    accept: "bg-green-700 text-white shadow-xl",
+    approve: "bg-green-700 text-white shadow-xl",
     reject: "bg-red-500 text-white shadow-xl",
     pending: "bg-orange-500 text-white shadow-xl",
   };
@@ -31,6 +33,11 @@ export const DetailBoxPetugas = ({
     setStatusTidakLiar("Tidak Liar");
   }, []);
 
+  // Effect untuk memantau perubahan pada prop status_post
+  useEffect(() => {
+    setCurrentStatusPost(status_post);
+  }, [status_post]);
+
   const getStatusColor = (status) => {
     const lowerStatus = status?.toLowerCase() || "";
     return statusLaporanColors[lowerStatus] || "bg-gray-100 text-gray-800";
@@ -40,21 +47,22 @@ export const DetailBoxPetugas = ({
     const dropStatus = status?.toLowerCase() || "";
     return prediksiLaporan[dropStatus] || "bg-gray-100 text-gray-800";
   };
+
   return (
-    <div class="flex flex-wrap -mx-3 ">
-      <div class="w-full max-w-full px-3 shrink-0 md:w-12/12 md:flex-0 ">
-        <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl rounded-2xl bg-clip-border">
-          <div class="flex-auto p-6">
-            <p class="leading-normal font-bold uppercase text-sm">
+    <div className="flex flex-wrap -mx-3 ">
+      <div className="w-full max-w-full px-3 shrink-0 md:w-12/12 md:flex-0 ">
+        <div className="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl rounded-2xl bg-clip-border">
+          <div className="flex-auto p-6">
+            <p className="leading-normal font-bold uppercase text-sm">
               DETAIL INFORMATION
             </p>
-            <hr class="h-px mx-0 my-4 bg-transparent border-0 opacity-25 bg-gradient-to-r from-transparent via-black/40 to-transparent" />
-            <div class="flex flex-wrap -mx-3 mb-4">
-              <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                <div class="mb-4">
+            <hr className="h-px mx-0 my-4 bg-transparent border-0 opacity-25 bg-gradient-to-r from-transparent via-black/40 to-transparent" />
+            <div className="flex flex-wrap -mx-3 mb-4">
+              <div className="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                <div className="mb-4">
                   <label
-                    for="nama"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                    htmlFor="nama"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
                   >
                     Nama Petugas
                   </label>
@@ -65,15 +73,16 @@ export const DetailBoxPetugas = ({
                       name="nama"
                       className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                       required
+                      readOnly
                     />
                   )}
                 </div>
               </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                <div class="mb-4">
+              <div className="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                <div className="mb-4">
                   <label
-                    for="username"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                    htmlFor="username"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
                   >
                     Identitas Petugas
                   </label>
@@ -84,15 +93,16 @@ export const DetailBoxPetugas = ({
                       name="username"
                       className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                       required
+                      readOnly
                     />
                   )}
                 </div>
               </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                <div class="mb-4">
+              <div className="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                <div className="mb-4">
                   <label
-                    for="email"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                    htmlFor="email"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
                   >
                     Tanggal Dan Waktu
                   </label>
@@ -103,74 +113,16 @@ export const DetailBoxPetugas = ({
                       value={formattedDateSet(tanggaldanwaktu)}
                       className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                       required
+                      readOnly
                     />
                   )}
                 </div>
               </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                <div class="mb-4">
+              <div className="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
+                <div className="mb-4">
                   <label
-                    for="first name"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
-                  >
-                    Latitude
-                  </label>
-                  {latitude && (
-                    <input
-                      type="text"
-                      name="first name"
-                      value={latitude}
-                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
-                      required
-                    />
-                  )}
-                </div>
-              </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
-                <div class="mb-4">
-                  <label
-                    for="last name"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
-                  >
-                    Longitude
-                  </label>
-                  {longitude && (
-                    <input
-                      type="text"
-                      name="last name"
-                      value={longitude}
-                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
-                      required
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-wrap -mx-3">
-              <div class="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
-                <div class="mb-4">
-                  <label
-                    for="address"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
-                  >
-                    Lokasi
-                  </label>
-                  {lokasi && (
-                    <input
-                      type="text"
-                      name="address"
-                      value={lokasi}
-                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
-                      required
-                    />
-                  )}
-                </div>
-              </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
-                <div class="mb-4">
-                  <label
-                    for="city"
-                    class="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                    htmlFor="city"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
                   >
                     Hari Pelaporan
                   </label>
@@ -181,6 +133,69 @@ export const DetailBoxPetugas = ({
                       value={hari}
                       className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
                       required
+                      readOnly
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                <div className="mb-4">
+                  <label
+                    htmlFor="first name"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                  >
+                    Latitude
+                  </label>
+                  {latitude && (
+                    <input
+                      type="text"
+                      name="first name"
+                      value={latitude}
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
+                      readOnly
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="w-full max-w-full px-3 shrink-0 md:w-6/12 md:flex-0">
+                <div className="mb-4">
+                  <label
+                    htmlFor="last name"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                  >
+                    Longitude
+                  </label>
+                  {longitude && (
+                    <input
+                      type="text"
+                      name="last name"
+                      value={longitude}
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
+                      readOnly
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap -mx-3">
+              <div className="w-full max-w-full px-3 shrink-0 md:w-full md:flex-0">
+                <div className="mb-4">
+                  <label
+                    htmlFor="address"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700 "
+                  >
+                    Lokasi
+                  </label>
+                  {lokasi && (
+                    <input
+                      type="text"
+                      name="address"
+                      value={lokasi}
+                      className=" bg-gray-50 border border-gray-300 text-gray-900 font-bold text-sm rounded-lg focus:ring-gray-50 focus:border-gray-300 block w-full p-2.5 bg-gray-200 border-gray-50 placeholder-black text-black"
+                      required
+                      readOnly
                     />
                   )}
                 </div>
@@ -191,14 +206,30 @@ export const DetailBoxPetugas = ({
                     htmlFor="status"
                     className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700"
                   >
+                    Akurasi Pelaporan
+                  </label>
+                  <div
+                    className={`p-2 rounded-md bg-gray-700 text-white shadow-xl text-center font-medium`}
+                  >
+                    {akurasi ? Number(akurasi).toFixed(1) : "-"} %
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0">
+                <div className="mb-4">
+                  <label
+                    htmlFor="status"
+                    className="inline-block mb-2 ml-1 font-bold text-xs text-slate-700"
+                  >
                     Status Laporan
                   </label>
                   <div
                     className={`p-2 rounded-md ${getStatusColor(
-                      status_post
+                      currentStatusPost
                     )} text-center font-medium`}
                   >
-                    {status_post || "-"}
+                    {currentStatusPost || "-"}
                   </div>
                 </div>
               </div>
@@ -219,27 +250,8 @@ export const DetailBoxPetugas = ({
                   </div>
                 </div>
               </div>
-              <div class="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0"></div>
+              <div className="w-full max-w-full px-3 shrink-0 md:w-4/12 md:flex-0"></div>
             </div>
-
-            {/* <div class="flex flex-wrap -mx-3">
-              <div class="w-full max-w-full px-4 shrink-0 md:w-full md:flex-0">
-                <div class="flex space-x-4">
-                  <button
-                    type="button"
-                    class="inline-block px-8 py-2 mb-4 ml-auto font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-red-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    type="button"
-                    class="inline-block px-8 py-2 mb-4 ml-auto font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-green-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </div> */}
           </div>
         </div>
       </div>

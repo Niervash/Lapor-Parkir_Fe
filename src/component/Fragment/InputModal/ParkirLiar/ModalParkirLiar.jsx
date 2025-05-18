@@ -10,7 +10,7 @@ import { AddDataParkir } from "../../../../config/User/Pelaporan/ParkirLIar/Park
 import ParkirLiarmaps from "../../maps/parkirliarmaps/parkirliarmaps";
 import { toast } from "sonner";
 
-export const ModalParkirLiar = ({ isOpen, onClose }) => {
+export const ModalParkirLiar = ({ isOpen, onClose, onSuccess }) => {
   const [tanggaldanwaktu, setWaktu] = useState("");
   const [hari, setHari] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -96,6 +96,10 @@ export const ModalParkirLiar = ({ isOpen, onClose }) => {
       setSuccessMessage("Pelaporan berhasil!");
       setIsLoading(false);
       setShowSuccessPopup(true);
+
+      if (onSuccess) {
+        onSuccess();
+      }
 
       setTimeout(() => {
         setShowSuccessPopup(false);

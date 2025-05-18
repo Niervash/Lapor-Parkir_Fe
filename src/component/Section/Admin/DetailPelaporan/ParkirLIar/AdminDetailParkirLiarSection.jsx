@@ -4,9 +4,85 @@ import { Marker, Popup } from "react-leaflet";
 import { AdminDetailBoxParkir } from "../../../../Fragment/Admin/DetailTable/DetailBox/AdminDetailboxParkir/AdminDetailBoxParkir";
 import logo from "../../../../../../public/assets/img/carousel-1.jpg";
 import { useParams } from "react-router-dom";
-import { AdminGetDetailParkir } from "../../../../../config/Admin/Pelaporan/ParkirLIar/ParkirLiar.admin";
+import {
+  AdminGetDetailParkir,
+  DeleteLaporanParkir,
+} from "../../../../../config/Admin/Pelaporan/ParkirLIar/ParkirLiar.admin";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import {
+  ApproveParkir,
+  RejectParkir,
+} from "../../../../../config/Admin/Detail/buttonFunction";
+
+// Toast notification component
+const ToastNotification = ({ message, type, onClose }) => {
+  const bgColor = {
+    success: "bg-green-500",
+    error: "bg-red-500",
+    info: "bg-blue-500",
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="fixed top-5 right-5 z-50">
+      <div
+        className={`${bgColor[type]} text-white px-6 py-3 rounded-md shadow-lg flex items-center justify-between min-w-64`}
+      >
+        <span>{message}</span>
+        <button
+          onClick={onClose}
+          className="ml-4 text-white hover:text-gray-200"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Confirmation modal component
+const ConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText,
+  confirmColor,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 className="text-xl font-bold mb-2">{title}</h3>
+        <p className="mb-6">{message}</p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className={`px-4 py-2 text-white rounded-md ${confirmColor} hover:opacity-90`}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MapWithCenter = ({ latitude, longitude }) => {
   const map = useMap();
@@ -25,12 +101,15 @@ export const AdminDetailParkirLiarSection = () => {
   const [item, setItem] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getData = async () => {
       try {
         const response = await AdminGetDetailParkir(id);
-        console.log("asdad", item);
         setItem(response.data || {});
         toast.success("Fetching berhasil!");
       } catch (err) {
@@ -43,6 +122,100 @@ export const AdminDetailParkirLiarSection = () => {
 
     getData();
   }, [id]);
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+  };
+
+  const closeNotification = () => {
+    setNotification(null);
+  };
+
+  const openModal = (action) => {
+    let config = {};
+    switch (action) {
+      case "approve":
+        config = {
+          title: "Setujui Laporan",
+          message: "Apakah anda yakin igin menerima pelaporan ini ?",
+          confirmText: "Approve",
+          confirmColor: "bg-green-500",
+          onConfirm: ApproveFunc,
+        };
+        break;
+      case "reject":
+        config = {
+          title: "Laporan Ditolak",
+          message: "Apakah anda yakin igin menolak pelaporan ini ?",
+          confirmText: "Reject",
+          confirmColor: "bg-red-500",
+          onConfirm: RejectFunc,
+        };
+        break;
+      case "delete":
+        config = {
+          title: "Konfirmasi Hapus",
+          message: "Apakah Anda yakin ingin menghapus data parkir liar ini?",
+          confirmText: "Delete",
+          confirmColor: "bg-red-600",
+          onConfirm: DeleteFunc,
+        };
+        break;
+      default:
+        return;
+    }
+    setModalConfig(config);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const refreshPage = () => {
+    window.location.reload();
+  };
+
+  const ApproveFunc = async () => {
+    try {
+      await ApproveParkir(item.id, { status_post: "Approve" });
+      showNotification("Status successfully changed to Approve", "success");
+      closeModal();
+      setTimeout(refreshPage, 100); // Refresh after 1.5 seconds
+    } catch (error) {
+      console.error("Failed to change status", error);
+      showNotification("Failed to change status", "error");
+      closeModal();
+    }
+  };
+
+  const RejectFunc = async () => {
+    try {
+      await RejectParkir(item.id, { status_post: "Reject" });
+      showNotification("Status successfully changed to Reject", "success");
+      closeModal();
+      setTimeout(refreshPage, 100); // Refresh after 1.5 seconds
+    } catch (error) {
+      console.error("Failed to change status", error);
+      showNotification("Failed to change status", "error");
+      closeModal();
+    }
+  };
+
+  const DeleteFunc = async () => {
+    try {
+      // Replace with your actual delete function
+      // await DeleteParkir(id_k);
+      await DeleteLaporanParkir(item.id);
+      showNotification("Report successfully deleted", "success");
+      closeModal();
+      setTimeout(() => navigate("/admin/petugas liar"), 100); // Go back after 1.5 seconds
+    } catch (error) {
+      console.error("Failed to delete report", error);
+      showNotification("Failed to delete report", "error");
+      closeModal();
+    }
+  };
 
   if (loading)
     return (
@@ -58,8 +231,29 @@ export const AdminDetailParkirLiarSection = () => {
     );
   const latitude = item?.latitude ?? null;
   const longitude = item?.longitude ?? null;
+
+  // 3 button
+
   return (
     <div className="w-full px-6 mx-auto">
+      {notification && (
+        <ToastNotification
+          message={notification.message}
+          type={notification.type}
+          onClose={closeNotification}
+        />
+      )}
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        confirmText={modalConfig.confirmText}
+        confirmColor={modalConfig.confirmColor}
+      />
+
       <ToastContainer
         position="top-right"
         autoClose={2000}
@@ -73,7 +267,7 @@ export const AdminDetailParkirLiarSection = () => {
       />
       <div className="flex flex-wrap mt-6 -mx-3 grid grid-cols-1 lg:grid-cols-2 gap-2">
         {/* Map Section */}
-        <div className="w-full max-w-full px-3 lg:flex-none  mt-2">
+        <div className="w-full max-w-full px-3 lg:flex-none  mt-2 z-0">
           <div className="flex-auto p-4 rounded-2xl border-0 shadow-2xl bg-white">
             <h1 className="ml-5 mb-3 font-bold text-gray-500">MAPS</h1>
             {latitude !== null && longitude !== null ? (
@@ -120,7 +314,6 @@ export const AdminDetailParkirLiarSection = () => {
           </div>
         </div>
       </div>
-
       <div className="w-full mt-4 pb-4 mx-auto">
         <AdminDetailBoxParkir
           jenis_kendaraan={item.jenis_kendaraan || "N/A"}
@@ -128,11 +321,41 @@ export const AdminDetailParkirLiarSection = () => {
           latitude={latitude || "N/A"}
           longitude={longitude || "N/A"}
           lokasi={item.lokasi || "N/A"}
+          nopol={item.nopol || "N/A"}
           status_post={item.status_post || "N/A"}
           status={item.status || "N/A"}
           deskripsi_masalah={item.deskripsi_masalah || "Tidak ada deskripsi"}
           hari={item.hari || "N/A"}
         />
+      </div>
+      <div className="w-full mt-4 pb-4 mx-auto">
+        <div className="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl rounded-2xl bg-clip-border p-6">
+          <div className="w-full max-w-full px-4 shrink-0 md:w-full md:flex-0">
+            <div className="flex flex-col md:flex-row md:justify-end space-y-4 md:space-y-0 md:space-x-4">
+              <button
+                type="button"
+                onClick={() => openModal("delete")}
+                className="inline-block px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-red-600 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
+              >
+                Delete
+              </button>
+              <button
+                type="button"
+                onClick={() => openModal("reject")}
+                className="inline-block px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-red-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
+              >
+                Reject
+              </button>
+              <button
+                type="button"
+                onClick={() => openModal("approve")}
+                className="inline-block px-8 py-2 font-bold leading-normal text-center text-white align-middle transition-all ease-in bg-green-500 border-0 rounded-lg shadow-md cursor-pointer text-xs tracking-tight-rem hover:shadow-xs hover:-translate-y-px active:opacity-85"
+              >
+                Approve
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
